@@ -1,1 +1,0 @@
-Firmware Rebels README file
