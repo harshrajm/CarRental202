@@ -1,0 +1,10 @@
+User Stories based on handout
+-----------------------------
+ * As a user I want to return a rented car to the rental location so that I can pay my charges.
+ * As a user I want to pay my charges due after return so I can end my rental.
+ * As a user I want to provide comments about the vehicle and rental service (if needed) so I can provide feedback.
+ * As a user I want to enter information about the condition of the returned vehicle so that I can inform about damages.
+ * As a user I want to terminate my membership at any time so that I can no longer use the system.
+ * As an admin I want to terminate the membership of a user so that I can be in control.
+ * As a user I should be able to access the system via Chrome so that I can use it with ease.
+ * As a user I should be charged late fees if applicable (??Is this a user story)
