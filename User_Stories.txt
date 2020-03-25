@@ -13,3 +13,7 @@ User Stories based on handout
  * As a user(Admin) I want to reassign vehicles to different location in the system so that I can have the flexibility of moving the vehicles between locations based on demand.
  * As a user(Admin) I want to make changes to the vehicle properties in the system so that I can edit vehicle details when needed.
  * As a user(Admin) I want to remove vehicles/locations from the system so that I can edit details as required.
+ * As a user I want to register with username, password, email, resident address, credit card info, driving licence state and driving licence number in the system so that I can gain access into the system.
+ * As a user I must be able to buy/extend/cancel the membership as required in the system.
+ * As a user I want login into the system with username and password so than I can rent a vehicle using the system.
+ * As a user I want to browse and search rental locations and vehicles before renting the vehicle. 
