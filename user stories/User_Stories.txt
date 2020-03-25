@@ -25,3 +25,12 @@ User Stories based on handout
  * As a User I should be able to terminate my membership at any point in time.
  * As a User I want to be able to access the Rental site on a common web browser.
  * As a User I want the system to be able to maintain the security of personal information that I’ve given in.
+
+ * As a sys admin, I need to enter into the system vehicle types so that I can keep track of all rental cars available.
+   AC: Vehicle types: small, full-size, truck, luxury
+ * As a sys admin, I need to enter details for for each vehicle type so that the user can make a better decision in renting a car.
+   AC: Details must include - hourly price ranges (1-5, 6-10,...) , late return fee, 6 month membership price
+ * As a sys admin, I need to define and enter rental locations so that I can keep track of all vehicles assigned to each location.
+   AC: Each location should include a name, address and vehicle capacity
+ * As a sys admin, I need to define and enter individual vehicle details so that user can make a better decision in renting a car.
+   AC: Details must include - vehicle type, properties (make, model, year, reg tag, current mileage, last serviced) and vehicle condition (good, needs cleaning, needs maintainence)
