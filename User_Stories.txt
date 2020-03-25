@@ -8,3 +8,8 @@ User Stories based on handout
  * As an admin I want to terminate the membership of a user so that I can be in control.
  * As a user I should be able to access the system via Chrome so that I can use it with ease.
  * As a user I should be charged late fees if applicable (??Is this a user story)
+
+ * As a user(Admin) I want to make changes to the car rental prices in the system so that I can charge the customer as per my need.
+ * As a user(Admin) I want to reassign vehicles to different location in the system so that I can have the flexibility of moving the vehicles between locations based on demand.
+ * As a user(Admin) I want to make changes to the vehicle properties in the system so that I can edit vehicle details when needed.
+ * As a user(Admin) I want to remove vehicles/locations from the system so that I can edit details as required.
