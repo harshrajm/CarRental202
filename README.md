@@ -4,7 +4,7 @@
 
 Team Members: 
 
-- Vijayshree
+- Vijayashree
 - Joseph
 - Harshraj
 - Varun
