@@ -2,9 +2,14 @@
 
 ## Project Name: **Car Rental Web Application**
 
-Team Members: 
+## Team Name: Firmware Rebels
+
+## Team Members: 
 
 - Vijayashree
 - Joseph
 - Harshraj
 - Varun
+
+## UI Wireframes
+
