@@ -3,6 +3,18 @@ What tasks did I work on / complete?
 What am I planning to work on next?
 What tasks are blocked waiting on another team member?
 
+4/7/2020
+--------
+Implemented basic rest endpoints for login, register user, admin access, 
+and user deletion. Used sessions for session management.
+
+Need to change sessions to jwt tokens as per Harshraj's request.
+In a load balanced environment, sessions will need sticky sessions enabled in Load balancer.
+Need to add other endpoints for inventory access and management.
+Will need to help whoever is working on UI to integrate currently working endpoints.
+
+No blockers
+
 3/31/2020
 ---------
 Broke down user stories to tasks which need to be worked on.
