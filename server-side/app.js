@@ -10,6 +10,8 @@ const db_connect_string = process.env.DB_CONNECT || 'localhost:27017/cmpe202';
 
 const User = require('./app/models/user');
 
+const secret = require('./app/config/jwtConfig');
+
 
 /*  EXPRESS SETUP  */
 
@@ -19,20 +21,24 @@ const app = express();
 app.use(express.static(__dirname));
 
 const bodyParser = require('body-parser');
-const expressSession = require('express-session')({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false
-});
+//const expressSession = require('express-session')({
+//  secret: 'secret',
+//  resave: false,
+//  saveUninitialized: false
+//});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressSession);
+//app.use(expressSession);
 
 /*  PASSPORT SETUP  */
 const passport = require('passport');
+const passportJWT = require('passport-jwt');
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
+const jwt = require('jsonwebtoken');
+const keys = 'secret';
 app.use(passport.initialize());
-app.use(passport.session());
 app.listen(port);
 console.log(`Server running at http://${hostname}:${port}/`); 
 
@@ -53,6 +59,23 @@ passport.use(UserDetails.createStrategy());
 passport.serializeUser(UserDetails.serializeUser());
 passport.deserializeUser(UserDetails.deserializeUser());
 
+passport.use(new JWTStrategy({
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  secretOrKey   : 'secret'
+},
+function (jwtPayload, cb) {
+
+  //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.  
+  return UserDetails.findOne({username: jwtPayload.username})
+      .then(user => {
+          return cb(null, user);
+      })
+      .catch(err => {
+          return cb(err);
+      });
+}
+));
+
 /* PASSPORT SIGNUP STRATEGY */
 var LocalStrategy   = require('passport-local').Strategy;
 
@@ -60,10 +83,6 @@ app.post('/register', (req, res) => {
   //TODO check if all params are received
   UserDetails.findOne({email: req.body.email}).then((user) => {
     if (user) {
-      console.log("---ERROR---");
-      console.log(user);
-      console.log(req.body.email);
-      console.log("---ERROR---");
       res.status(400).send("Error - email already used", user, req.body.email);
     } else {
       const user = new UserDetails({
@@ -97,31 +116,47 @@ ENDPOINTS
 3. /admin_dashboard - GET - Only users with admin role can access this.
 4. /user - GET - returns the currently logged in users object
 5. /logout - GET - clears the current session and redirects to login.
+6. /user - DELETE - delete current user - for customer roles only
+7. /admin/user - DELETE - delete other users -> for admin only
 
 */
 
-const connectEnsureLogin = require('connect-ensure-login');
 
-app.post('/login', (req, res, next) => {
-  passport.authenticate('local',
-  (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
+app.post('/login', (req, res) => {
+  passport.authenticate(
+    'local',
+    { session: false },
+    (error, user) => {
 
-    if (!user) {
-      return res.redirect('/login?info=' + info);
-    }
+      if (error || !user) {
+        console.log(error, user);
+        res.status(400).json({ error });
+      } else {
+        /** This is what ends up in our JWT */
+      const payload = {
+        username: user.username,
+        expires: Date.now() + parseInt(process.env.JWT_EXPIRATION_MS),
+      };
 
-    req.logIn(user, function(err) {
-      if (err) {
-        return next(err);
+      /** assigns payload to req.user */
+      req.login(payload, {session: false}, (error) => {
+        if (error) {
+          console.log("Some error ", error);
+          res.status(400).send({ error });
+        }
+        else {
+          /** generate a signed json web token and return it in the response */
+          const token = jwt.sign(JSON.stringify(payload), 'secret');
+
+          /** return the token and username **/
+          const resp = { "token": token, "username": user.username }
+          console.log(resp);
+          res.send(resp);
+        }
+      });
       }
-
-      return res.redirect('/');
-    });
-
-  })(req, res, next);
+    },
+  )(req, res);
 });
 
 app.get('/login',
@@ -130,17 +165,17 @@ app.get('/login',
 );
 
 app.get('/',
-  connectEnsureLogin.ensureLoggedIn(),
+  passport.authenticate('jwt', {session: false}),
   (req, res) => res.sendFile('./app/views/index.html', {root: __dirname})
 );
 
 app.get('/admin_dashboard',
-  connectEnsureLogin.ensureLoggedIn(),User.checkIsInRole(User.Roles.Admin),
+passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => res.sendFile('./app/views/private.html', {root: __dirname})
 );
 
 app.get('/user',
-  connectEnsureLogin.ensureLoggedIn(),
+ passport.authenticate('jwt', {session: false}),
   (req, res) => res.send({user: req.user})
 );
 
@@ -149,7 +184,60 @@ app.all("/logout", function(req, res) {
   res.redirect("/login");
 });
 
-/* REGISTER SOME USERS */
+//delete user endpoint
+//this endpoint is for admin only
+app.delete('/admin/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
+(req, res) => {
+  console.log('Deleting user', req.body.email);
+    if (req.body.email){
+      UserDetails.findOne({email: req.body.email}).then((user) => {
+        if (user){
+          UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
+            if (obj.ok != 1){
+              console.log("Object delete error");
+              console.log(err);
+              res.status(500).send('User delete failed');
+            } else {
+              res.send('User deleted');
+            }
+          }
+          );
+        } else {
+          res.status(404).send('User not found');
+        }
+      })
+    } else {
+      res.status(400).send('User email required');
+    }
+});
+
+//delete user endpoint
+//this endpoint is for customer only
+//to terminate his account
+app.delete('/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Customer),
+(req, res) => {
+      //delete the user
+      UserDetails.findOne({email: req.user.email}).then((user) => {
+        if (user){
+          UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
+            if (obj.ok != 1){
+              console.log("Object delete error");
+              console.log(err);
+              res.status(500).send('User delete failed');
+            } else {
+              res.send('User deleted');
+              //user should be redirected by UI
+            }
+          }
+          );
+        } else {
+          res.status(404).send('User not found');
+        }
+      })
+});
+
+
+/* REGISTER ADMIN USERS */
 
 UserDetails.register({username:'admin', active: false, role:'Admin'}, 'admin');
 
