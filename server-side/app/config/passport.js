@@ -9,6 +9,7 @@ const passportJWT = require('passport-jwt');
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 const User = require('../models/user');
+const vehicle = require('../models/vehicle');
 
 
 passport.initialize();
@@ -22,6 +23,7 @@ mongoose.connect('mongodb://'+db_connect_string, { useNewUrlParser: true, useUni
 //console.log(User);
 User.UserSchema.plugin(passportLocalMongoose);
 const UserDetails = mongoose.model('userInfo', User.UserSchema, 'userInfo');
+const VehicleDetails = mongoose.model('vehicleInfo', vehicle, 'vehicleInfo');
 
 /* PASSPORT LOCAL AUTHENTICATION */
 
@@ -51,5 +53,5 @@ function (jwtPayload, cb) {
 
 UserDetails.register({username:'admin', active: false, role:'Admin'}, 'admin');
 
-module.exports = { passport, UserDetails, User };
+module.exports = { passport, UserDetails, User, VehicleDetails, vehicle};
 
