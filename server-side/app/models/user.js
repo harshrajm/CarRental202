@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+var Booking = require('./booking');
+
 const UserSchema = new Schema({
     username: String,
     name: String,
@@ -10,7 +12,9 @@ const UserSchema = new Schema({
     address: String,
     creditCard: String,
     licenseState: String,
-    licenseNumber: String
+    licenseNumber: String,
+    membershipEndDate: Date,
+    bookings:  { type: Array, "default": [] }
 });
 
 const Roles = {
