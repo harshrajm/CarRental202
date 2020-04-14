@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
+import auth from "../services/authService";
 
 class LoginForm extends Component {
   state = {
@@ -14,18 +16,30 @@ class LoginForm extends Component {
     this.setState({ data });
   };
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault();
     console.log("form submitted!!", this.state.data);
-    //do http call
+    //call backend
+    try {
+      const { data } = this.state;
+      await auth.login(data);
+      //go back to what the user was doing
+      //const { state } = this.props.location;
+      //window.location = state ? state.from.pathname : "/";
+      window.location = "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        console.log("400 error");
+      }
+    }
   };
 
   render() {
-    const { data } = this.state;
+    if (auth.getCurrentUser()) return <Redirect to="/" />;
     return (
       <React.Fragment>
         <div className="row justify-content-center">
-          <div className="col-6">
+          <div className="col-4">
             <div className="card addTopMargin">
               <div className="card-header">Login</div>
               <div className="card-body">

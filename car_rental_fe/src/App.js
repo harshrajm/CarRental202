@@ -5,10 +5,18 @@ import NavBar from "./components/navBar";
 import NotFound from "./components/notFound";
 import RegisterForm from "./components/registerForm";
 import LoginForm from "./components/loginForm";
+import Logout from "./components/logout";
+import auth from "./services/authService";
 import "./App.css";
 
 class App extends Component {
   state = {};
+
+  componentDidMount() {
+    const user = auth.getCurrentUser();
+    this.setState({ user });
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -18,7 +26,7 @@ class App extends Component {
           <Switch>
             <Route path="/register" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
-            {/* <Route path="/logout" component={Logout} /> */}
+            <Route path="/logout" component={Logout} />
             <Route path="/book" component={BookingComponent} />
             {/* <Route path="/myBookings" component={MyBookingsComponent} /> */}
             <Route path="/not-found" component={NotFound} />
