@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import UsStatesComponent from "./common/usStatesDropdownComponent";
+import UsStates from "./common/usStatesDropdown";
 
 class RegisterForm extends Component {
   state = {
@@ -141,7 +141,7 @@ class RegisterForm extends Component {
                       <div className="form-group">
                         <label>DL issue state</label>
                         <br />
-                        <UsStatesComponent
+                        <UsStates
                           name="licenseState"
                           defaultValue={data.licenseState}
                           onSelectState={this.handleChange}

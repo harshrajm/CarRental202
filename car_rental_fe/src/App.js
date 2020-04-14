@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Route, Redirect, Switch } from "react-router-dom";
-import BookingComponent from "./components/bookingComponent";
+import CarBooking from "./components/carBooking";
 import NavBar from "./components/navBar";
 import NotFound from "./components/notFound";
 import RegisterForm from "./components/registerForm";
@@ -18,16 +18,17 @@ class App extends Component {
   }
 
   render() {
+    const { user } = this.state;
     return (
       <React.Fragment>
-        <NavBar />
+        <NavBar user={user} />
         {/* <button className="btn btn-primary">showing button</button> */}
         <div className="container">
           <Switch>
             <Route path="/register" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={Logout} />
-            <Route path="/book" component={BookingComponent} />
+            <Route path="/book" component={CarBooking} />
             {/* <Route path="/myBookings" component={MyBookingsComponent} /> */}
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/book" />

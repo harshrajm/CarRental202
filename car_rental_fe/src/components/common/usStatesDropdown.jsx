@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-class UsStatesComponent extends Component {
+class UsStates extends Component {
   render() {
     const { defaultValue, name } = this.props;
     return (
@@ -75,4 +75,4 @@ class UsStatesComponent extends Component {
   }
 }
 
-export default UsStatesComponent;
+export default UsStates;
