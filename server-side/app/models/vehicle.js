@@ -12,7 +12,8 @@ const vehicleSchema = new Schema({
     lastService: Date,
     condition: String,
     baseRate: Number,
-    hourlyRate: Number, 
+    hourlyRate: { type: Array, "default": []},
+    vehicleImageURL: String, 
     bookings:  { type: Array, "default": [] }
 });
 

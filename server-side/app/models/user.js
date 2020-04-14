@@ -11,9 +11,14 @@ const UserSchema = new Schema({
     email: String,
     address: String,
     creditCard: String,
+    creditCardIssuer: String,
+    creditCardExpiry: Date,
+    creditCardNameonCard: String,
+    creditCardCVV: String,
     licenseState: String,
     licenseNumber: String,
     membershipEndDate: Date,
+    profilePictureURL: String,
     bookings:  { type: Array, "default": [] }
 });
 

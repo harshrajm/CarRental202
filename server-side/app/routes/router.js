@@ -6,8 +6,10 @@ var UserDetails = require('../config/passport').UserDetails;
 var User = require('../config/passport').User;
 var vehicle = require('../config/passport').vehicle;
 var vehicleDetails = require('../config/passport').VehicleDetails;
-var BookingDetails = require('../config/passport').BookingDetails;
+var bookingDetails = require('../config/passport').BookingDetails;
+var locationDetails = require('../config/passport').LocationDetails;
 var booking = require('../config/passport').booking;
+var location = require('../config/passport').location;
 
 const jwt = require('jsonwebtoken');
 const keys = 'secret';
@@ -38,6 +40,7 @@ router.post('/register', (req, res) => {
           creditCardIssuer: req.body.creditCardIssuer,
           licenseState: req.body.licenseState,
           licenseNumber: req.body.licenseNumber,
+          profilePictureURL: req.body.profilePictureURL,
           membershipEndDate: d,
         });
         console.log(user);
@@ -154,6 +157,29 @@ router.post('/register', (req, res) => {
         })
   });
 
+  router.post('/user/membership', passport.authenticate('jwt', {session: false}),
+  (req, res) => {
+    UserDetails.findOne({email: req.user.email}).then((user) => {
+      if (user){
+        var d = Date(user.membershipEndDate);
+        d.setMonth(d.getMonth() + 6);
+        UserDetails.updateOne({email: req.body.email}, {membershipEndDate: d }).then((obj)=> {
+          if (obj.ok != 1){
+            console.log("Object delete error");
+            console.log(err);
+            res.status(500).send('User delete failed');
+          } else {
+            res.send('User deleted');
+            //user should be redirected by UI
+          }
+        }
+        );
+      } else {
+        res.status(404).send('User not found');
+      }
+    })
+  }
+  )
 
 /* ADMIN ENDPOINTS 
    ---------------
@@ -167,9 +193,9 @@ vehicles (see below) are assigned to each rental location.
 
 1. /admin/user - DELETE - delete other users - admin only
 2. /vehicle - POST - add a vehicle to db - admin only
-3. /vehicle/{vehicleId} - GET - get a vehicle from db - customer/admin
-4. /vehicle/{vehicleId} - DELETE - delete a vehicle db - admin only
-5. /vehicle/{vehicleId} - PUT - update a vehicle in db - admin only
+3. /vehicle/{registrationTag} - GET - get a vehicle from db - customer/admin
+4. /vehicle/{registrationTag} - DELETE - delete a vehicle db - admin only
+5. /vehicle/{registrationTag} - PUT - update a vehicle in db - admin only
 6. /location - GET - get all location names? - admin/customer - ?? IS THIS NEEDED for finding close locations?
 7. /location/{name} - GET get all vehicles at a given location - admin/customer
 8. 
@@ -220,25 +246,45 @@ vehicles (see below) are assigned to each rental location.
     if (!req.body.registrationTag){
       return res.status(400).send("registrationTag missing");
     }
-    vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((obj)=>{
-      if (!obj){
-        const v = new vehicleDetails({
-          type: req.body.type,
-          location: req.body.location,
-          name: req.body.name,
-          registrationTag: req.body.registrationTag,
-          manufacturer: req.body.manufacturer,
-          mileage: req.body.mileage,
-          modelYear: req.body.modelYear,
-          lastService: req.body.lastService,
-          condition: req.body.condition
-        });
-        vehicleDetails.create(v);
-        return res.send(v);
+    //check if the location exists and has the capacity
+    locationDetails.findOne({name: req.body.location}).then((loc)=>{
+      if (loc){
+        if (loc.vehicleCapacity > loc.currentVehicles){
+          vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((obj)=>{
+            if (!obj){
+              const v = new vehicleDetails({
+                type: req.body.type,
+                location: req.body.location,
+                name: req.body.name,
+                registrationTag: req.body.registrationTag,
+                manufacturer: req.body.manufacturer,
+                mileage: req.body.mileage,
+                modelYear: req.body.modelYear,
+                lastService: req.body.lastService,
+                vehicleImageURL: req.body.vehicleImageURL,
+                condition: req.body.condition,
+                baseRate: req.body.baseRate,
+                hourlyRate: req.body.hourlyRate
+              });
+      
+              vehicleDetails.create(v);
+              //update the number then save
+              loc.currentVehicles+=1;
+              loc.save();
+              return res.send(v);
+            } else {
+              return res.status(400).send("vehicle with same id exists"); 
+            }
+          })
+
+        } else {
+          return res.status(400).send("This location is full");
+        }
       } else {
-        return res.status(400).send("vehicle with same id exists"); 
+        return res.status(400).send("Location does not exist");
       }
-    })
+    });
+    
   });
 
   router.delete('/vehicle', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
@@ -267,49 +313,144 @@ vehicles (see below) are assigned to each rental location.
       if (!obj){
         return res.status(404).send("vehicle not found"); 
       } else {
-        obj.type = req.body.type;
-        obj.location = req.body.location;
-        obj.name = req.body.name;
-        obj.manufacturer = req.body.manufacturer;
-        obj.mileage = req.body.mileage;
-        obj.modelYear = req.body.modelYear;
-        obj.lastService = req.body.lastService;
-        obj.condition = req.body.condition; 
-        obj.save();
-        return res.send(obj);
+        //Chek if location change
+        var old_location = obj.location;
+        if (req.body.location.localeCompare(obj.location) != 0){
+          //check new location capacity
+          locationDetails.findOne({name: req.body.location}).then((loc)=>{
+            if (loc){
+              if (loc.vehicleCapacity > loc.currentVehicles){
+                obj.type = req.body.type;
+                obj.location = req.body.location;
+                obj.name = req.body.name;
+                obj.manufacturer = req.body.manufacturer;
+                obj.mileage = req.body.mileage;
+                obj.modelYear = req.body.modelYear;
+                obj.lastService = req.body.lastService;
+                obj.vehicleImageURL = req.body.vehicleImageURL;
+                obj.condition = req.body.condition; 
+                obj.baseRate = req.body.baseRate;
+                obj.hourlyRate = req.body.hourlyRate;
+                obj.save();
+                loc.currentVehicles+=1;
+                loc.save();
+                //remove one vehicle from old location
+                locationDetails.findOne({name: old_location}).then((old_loc)=> {
+                  if (old_loc){
+                    old_loc.currentVehicles-=1;
+                    old_loc.save();
+                    return res.send(obj);
+                  } else {
+                    return res.status(500).send("Server error -> Cant find old location");
+                  }
+                })
+              } else {
+                return res.status(400).send("This location is full");
+              }
+            } else {
+              return res.status(400).send("Location does not exist");
+            }
+          })
+        } else {
+          obj.type = req.body.type;
+          obj.location = req.body.location;
+          obj.name = req.body.name;
+          obj.manufacturer = req.body.manufacturer;
+          obj.mileage = req.body.mileage;
+          obj.modelYear = req.body.modelYear;
+          obj.lastService = req.body.lastService;
+          obj.vehicleImageURL = req.body.vehicleImageURL;
+          obj.condition = req.body.condition; 
+          obj.baseRate = req.body.baseRate;
+          obj.hourlyRate = req.body.hourlyRate;
+          obj.save();
+          return res.send(obj);
+        }
       }
     })
   });
 
   router.get('/locations', passport.authenticate('jwt', {session: false}), (req, res) => {
-    console.log("Returning locations ");
-    vehicleDetails.distinct("location").then((obj) => {
+    locationDetails.find({}).then((obj) => {
       if (obj){
         return res.send(obj);
       } else {
-        return res.status(500).send("Server error");
+        return res.status(404).send("No locations exist");
       }
     });
   });
 
+  //get cars in a location
   router.get('/location', passport.authenticate('jwt', {session: false}), (req,res) => {
     if (!req.query.name) {
       return res.status(400).send('Missing name field');
     } else {
       vehicleDetails.find({ location: req.query.name} ).then((obj)=>{
-        if (!obj){
-          return res.status(404).send("No cars");
-        } else {
+        if (Array.isArray(obj) && obj.length){
           return res.send(obj);
+        } else {
+          return res.status(404).send("No cars");
         }
       });
     }
   });
 
+  //create a new location
+  router.post('/location', passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
+  (req,res) => {
+    //check if already exists
+    //ISSUE
+    //Sanjose can have multiple locaitons with different addesses
+    //How do you take care of such cases
+    locationDetails.findOne({ name: req.body.name}).then((obj)=> {
+      if (obj){
+        return res.status(400).send("This location name already exists "+obj);
+      } else {
+        l = new locationDetails({name: req.body.name, adress: req.body.adress, vehicleCapacity: req.body.vehicleCapacity})
+        l.save();
+        return res.send("Location saved");
+      }
+    })
+  })
+
+  //delete a location
+  router.delete('/location',passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
+  (req,res) => {
+    locationDetails.findOne({ name: req.body.name}).then((l)=> {
+      if (l){
+        locationDetails.deleteOne(l).then((result)=> {
+          if (result.ok == 1){
+            //Remove all the cars assigned to this location
+            //TODO
+            vehicleDetails.updateMany({location: req.body.name}, {location: "UNASSIGNED"}).then(
+              (obj)=> {
+                if (obj.Matched ){
+                  if (obj.Modified){
+                    return res.send("Location deleted");
+                  } else {
+                    //TODO should I rollback the location delete??
+                    return res.status(500).send("Delete failed. Server error");
+                  }
+                } else {
+                  return res.send("Location deleted");
+                }
+              });
+          } else {
+            return res.status(500).send("Delete failed");
+          }
+        })
+      } else {
+        return res.status(404).send("location not found");
+      }
+     })
+   })
+
+
+
   //return the bookings of current user
   router.get('/bookings', passport.authenticate('jwt', {session: false}), (req, res) => {
-    UserDetails.findOne({email: req.user.email}).then((user) => {
-      return res.send(user.bookings);
+    bookingDetails.find({email: req.user.email}).then((b) => {
+      return res.send(b);
     })
   });
 
@@ -318,51 +459,66 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
   if (!req.query.bookingId){
     return res.status(400).send('Missing bookingId parameter');
   } else {
-    UserDetails.findOne({ $and: [ {email: req.user.email}, {bookings: req.query.bookingId }] }).then((user) => {
-      if (!user){
+    bookingDetails.findOne({email: req.user.email, "_id": req.query.bookingId }).then((b) => {
+      if (!b){
         return res.status(404).send('No such booking found');
       } else {
-        return res.send(user);
+        return res.send(b);
       }
     })
   }
 });
 
 //create one booking for this user
+//check if this car is available at that time
 router.post('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   
   //check if vehicle exists
-  vehicleDetails.findOne({vehicleId: req.body.vehicleId}).then((v)=>{
-    if (!v){
+  vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((v)=>{
+    if (v){
+        //check if there is already a booking
+        isCarAvailable(req.body.registrationTag, req.body.checkOut, req.body.expectedCheckin ).then((available)=> {
+        if (available.localeCompare("200") == 0){
+          //generate an id
+          //cost should be retrieved from vehicle
+          var b = new bookingDetails({
+            isActive: true,
+            registrationTag: req.body.registrationTag,
+            email: req.user.email, 
+            checkOut: req.body.checkOut,
+            expectedCheckin: req.body.expectedCheckin,
+            registrationTag: req.body.registrationTag
+          });
+          b.save();
+          UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
+            if(obj.ok){
+              //Modify vehicle details also
+              vehicleDetails.updateOne({registrationTag: req.body.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
+                if (v.ok){
+                  return res.send('Created booking');
+                } else {
+                  //Rollback booking
+                  //not safety checking
+                  UserDetails.update({email: req.user.email}, { $pop: {bookings: b._id}}).then(()=>{
+                    return res.status(500).send("Booking failed");
+                  });
+                }
+              })
+      } else {
+        return res.status(500).send('Server error');
+      }
+    });
+  } else {
+    //This is when you need to suggest other cars
+    //That can be a different call from the client side
+    return res.status(400).send("vehicle not available at this time");
+  }
+  });
+    } else {
+      console.log()
       return res.status(400).send("This vehicle does not exist");
     }
   })
-  //generate an id
-  //cost should be retrieved from vehicle
-  var b = new BookingDetails({
-    isActive: true,
-    startTime: req.body.startTime,
-    checkout: req.body.checkout,
-    expectedCheckin: req.body.expectedCheckin,
-    vehicleId: req.body.vehicleId
-  });
-  UserDetails.update({ email: req.user.email}, { $push: { bookings: b } }).then((obj)=>{
-    if(obj.Modified){
-      //Modify vehicle details also
-      vehicleDetails.update({vehicleId: req.body.vehicleId}, { $push: { bookings: b } }).then((v)=>{
-        if (!v.Modified){
-          //Rollback booking
-          //not safety checking
-          UserDetails.update({email: req.user.email}, { $pop: {bookings: b}});
-          res.status(500).send("Booking failed");
-        }
-      })
-      
-      return res.send('Created booking');
-    } else {
-      return res.status(500).send('Server error');
-    }
-  });
 });
 
 //update one booking
@@ -373,16 +529,18 @@ router.put('/booking', passport.authenticate('jwt', {session: false}), (req, res
     return res.status(400).send('bookingId parameter missing');
   } else {
    //cost should be retrieved from vehicle
-    UserDetails.findOne({ $and: [ {email: req.user.email}, {bookings: req.query.bookingId }] }).then((user) => {
-      user.bookings.isActive = req.body.isActive;
-      user.bookings.actualCheckin = req.body.actualCheckin;
+    bookingDetails.findOne({ email: req.user.email, "_id": req.query.bookingId }).then((b) => {
+      b.isActive = req.body.isActive;
+      b.checkOut = b.checkOut;
+      b.expectedCheckin = req.body.expectedCheckin;
+      b.actualCheckin = req.body.actualCheckin;
       //for now cost is not updated
       //base rate remains same but final cost is applied on return
       //user.bookings.cost = req.body.cost;
-      user.bookings.feedback = req.body.feedback;
-      user.bookings.complaints = req.body.complaints;
-      user.bookings.paid = req.body.paid;
-      user.save();
+      b.feedback = req.body.feedback;
+      b.complaints = req.body.complaints;
+      b.paid = req.body.paid;
+      b.save();
       return res.send("Booking updated");
     });
   }
@@ -390,24 +548,23 @@ router.put('/booking', passport.authenticate('jwt', {session: false}), (req, res
 
 //cancel a booking
 router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
-  
   //need id
   if (!req.query.bookingId){
     return res.status(400).send('bookingId parameter missing');
   } else {
     //before deletion check if its less than an hour before checkout
     //check if the booking is active also
-    UserDetails.findOne({ $and: [ {email: req.user.email}, {bookings: req.query.bookingId }] }).then((user) => {
-      if (user){
-        if (user.bookings.isActive){
+    bookingDetails.findOne({ email: req.user.email, "_id": req.query.bookingId}).then((b) => {
+      if (b){
+        if (b.isActive){
           const today = Date();
-          const diffTime = user.bookings.checkout - today;
+          const diffTime = b.checkout - today;
           if (diffTime > 0){
             const diffHours = Math.ceil(diffTime / (1000 * 60 * 60 )); 
             if (diffHours > 1){
               //donot delete, just change isActive to false for now
-              user.bookings.isActive = false;
-              user.save();
+              b.isActive = false;
+              b.save();
               return res.send("Booking cancelled");
             } else {
               return res.status(405).send("Booking must be cancelled atleast one hour before");
@@ -433,24 +590,25 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
   } else {
     //check if this booking is valid
     //check if the booking is active also
-    UserDetails.findOne({ $and: [ {email: req.user.email}, {bookings: req.query.bookingId }] }).then((user) => {
-      if (user){
-        if (user.bookings.isActive){
+    bookingDetails.findOne({email: req.user.email, _id: req.query.bookingId }).then((b) => {
+      if (b){
+        if (b.isActive){
           //is this return valid?
           const today = Date();
-          const diffTime = user.bookings.checkout - today;
+          const diffTime = b.checkout - today;
           if (diffTime < 0){
               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60 )); 
-              user.bookings.isActive = false;
+              b.isActive = false;
               //charge fees based on rate
-              vehicleDetails.findOne({ vehicleId: user.bookings.vehicleId}).then((v)=>{
+              vehicleDetails.findOne({ registrationTag: b.registrationTag}).then((v)=>{
                 if (v){
-                  user.bookings.cost = user.bookings.cost + (diffHours * v.hourlyRate);
+                  //TODO fix formula
+                  b.cost = b.cost + (diffHours * v.hourlyRate);
                 } else {
                   return res.status(500).send("This vehicle does not exist in inventory");
                 }
               })
-              user.save();
+              b.save();
               return res.send("Return succesful");
             } else {
               return res.status(405).send("Booking must be cancelled atleast one hour before");
@@ -465,6 +623,33 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
   }
 })
 
+
+//NON Router methods
+function isCarAvailable(vid, date_a, date_b){
+  //check if vehicle exists
+  var date1 = new Date(date_a);
+  var date2 = new Date(date_b);
+  return new Promise(resolve => {
+    vehicleDetails.findOne({registrationTag: vid}).then((obj)=> {
+      if (obj){
+        //find bookings with the given date range
+        bookingDetails.findOne({registrationTag: vid, isActive: true, checkOut: {$lte: date2, $gte: date1}, expectedCheckin: {$lte: date2, $gte: date1}}).then((v)=> {
+          if (v){
+            //there are active bookings in the given range
+            console.log("Booking conflict");
+            resolve("400");
+          } else {
+            resolve("200");
+          }
+        })
+  
+      } else {
+        resolve("404");
+      }
+  
+    })
+   })
+}
 
 
 module.exports = router;
