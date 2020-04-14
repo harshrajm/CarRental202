@@ -80,8 +80,13 @@ router.post('/register', (req, res) => {
           res.status(400).json({ error });
         } else {
           /** This is what ends up in our JWT */
+          var admin = false;
+          if (user.role.localeCompare(User.Roles.Admin) == 0){
+            admin = true;
+          }
         const payload = {
           username: user.username,
+          isAdmin: admin,
           expires: Date.now() + parseInt(process.env.JWT_EXPIRATION_MS),
         };
   
