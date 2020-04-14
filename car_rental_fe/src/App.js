@@ -1,26 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { Route, Redirect, Switch } from "react-router-dom";
+import BookingComponent from "./components/bookingComponent";
+import NavBar from "./components/navBar";
+import NotFound from "./components/notFound";
+import RegisterForm from "./components/registerForm";
+import LoginForm from "./components/loginForm";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {};
+  render() {
+    return (
+      <React.Fragment>
+        <NavBar />
+        {/* <button className="btn btn-primary">showing button</button> */}
+        <div className="container">
+          <Switch>
+            <Route path="/register" component={RegisterForm} />
+            <Route path="/login" component={LoginForm} />
+            {/* <Route path="/logout" component={Logout} /> */}
+            <Route path="/book" component={BookingComponent} />
+            {/* <Route path="/myBookings" component={MyBookingsComponent} /> */}
+            <Route path="/not-found" component={NotFound} />
+            <Redirect from="/" exact to="/book" />
+            <Redirect to="/not-found" />
+          </Switch>
+        </div>
+      </React.Fragment>
+    );
+  }
 }
 
 export default App;
