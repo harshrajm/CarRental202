@@ -6,7 +6,7 @@ const vehicleSchema = new Schema({
     location: String,
     name: String,
     manufacturer: String,
-    registrationTag: String,
+    registrationTag: { type: String, unique: true},
     mileage: Number,
     modelYear: Date,
     lastService: Date,

@@ -22,6 +22,7 @@ app.use(function(req, res, next) {
   );
   next();
 });
+
 app.use(express.static(__dirname));
 
 const bodyParser = require("body-parser");

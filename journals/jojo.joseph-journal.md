@@ -3,6 +3,14 @@ What tasks did I work on / complete?
 What am I planning to work on next?
 What tasks are blocked waiting on another team member?
 
+4/14/2020
+---------
+Implemented endpoints for vehicles crud operations. User crud operation.
+Changed sessions to jwt token. Created endpoints for booking and return.
+Need to create endpoint for search and to suggest similar vehciles in other location.
+
+No blockers
+
 4/7/2020
 --------
 Implemented basic rest endpoints for login, register user, admin access, 

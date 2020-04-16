@@ -66,6 +66,7 @@ router.post('/register', (req, res) => {
   4. /user - GET - returns the currently logged in users object
   5. /logout - GET - clears the current session and redirects to login.
   6. /user - DELETE - delete current user - for customer roles only
+  7. /user/membership - POST
   */
   
   
@@ -233,6 +234,14 @@ vehicles (see below) are assigned to each rental location.
       }
   });
 
+  /*
+  endpoint : /vehicle
+  request type : GET
+  query parameters : registrationTag
+  return : Returns a single vehicle object
+           status 400 if query param missing
+           status 404 if vehcile not found 
+  */
   router.get('/vehicle', passport.authenticate('jwt', {session: false}),(req, res) => {
     if (!req.query.registrationTag){
       return res.status(400).send("registrationTag missing");
@@ -246,6 +255,19 @@ vehicles (see below) are assigned to each rental location.
     })
   });
 
+  /*
+  endpoint : /vehicle
+  request type : POST
+  query parameters : none
+  reqeuest body json : registrationTag, location, type, name, manufacturer, mileage, modelYear
+              lastService, vehicleImageURL, condition, baseRate, hourlyRate ([array])
+  return : Returns the vehicle object saved
+           status 400 if
+           1. location doesn't exist
+           2. location is in full capacity
+           3. location does not exist
+           Check the body of the return to identify the reason
+  */
   router.post('/vehicle', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => {
     if (!req.body.registrationTag){
@@ -292,6 +314,15 @@ vehicles (see below) are assigned to each rental location.
     
   });
 
+  /*
+  endpoint : /vehicle
+  request type : DELETE
+  query parameters : registrationTag
+  request body json : none
+  return :  200 vehicle deleted 
+            400 if registrationTag is missing
+            404 if vehcile not found
+  */
   router.delete('/vehicle', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => {
     if (!req.body.registrationTag){
@@ -307,14 +338,27 @@ vehicles (see below) are assigned to each rental location.
     })
   });
 
-  //to add a booking use a different endpoint
-  //TODO only update the params send
+  /*
+  endpoint : /vehicle
+  request type : PUT
+  query parameters : registrationTag 
+  request body json : location, type, name, manufacturer, mileage, modelYear
+              lastService, vehicleImageURL, condition, baseRate, hourlyRate ([array])
+  return :  200 and returns the updated object
+            400 if
+            1. registrationTag is missing
+            2. The new location is full
+            3. New location does not exist
+            500 server error if old locaiton is not found(Won't possibly happen)
+                
+  */
+ //TODO update only the parameters sent??
   router.put('/vehicle', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => {
-    if (!req.body.registrationTag){
+    if (!req.query.registrationTag){
       return res.status(400).send("registrationTag missing");
     }
-    vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((obj)=>{
+    vehicleDetails.findOne({registrationTag: req.query.registrationTag}).then((obj)=>{
       if (!obj){
         return res.status(404).send("vehicle not found"); 
       } else {
@@ -375,6 +419,14 @@ vehicles (see below) are assigned to each rental location.
     })
   });
 
+  /*
+  endpoint : /locations
+  request type : GET
+  query parameters : none
+  request body json : none
+  return :  Returns all the locations objects in db
+            404 if no locaiton exists
+  */
   router.get('/locations', passport.authenticate('jwt', {session: false}), (req, res) => {
     locationDetails.find({}).then((obj) => {
       if (obj){
@@ -385,6 +437,15 @@ vehicles (see below) are assigned to each rental location.
     });
   });
 
+  /*
+  endpoint : /location
+  request type : GET
+  query parameters : name 
+  request body json : none
+  return :  Returns vehicles in a location
+            400 if missing name field
+            404 if no cars exist
+  */
   //get cars in a location
   router.get('/location', passport.authenticate('jwt', {session: false}), (req,res) => {
     if (!req.query.name) {
@@ -400,6 +461,15 @@ vehicles (see below) are assigned to each rental location.
     }
   });
 
+
+  /*
+  endpoint : /location
+  request type : POST
+  query parameters : none
+  request body json : name, address, vehicleCapacity
+  return :  200 and Location saved
+            400 If location name already exists
+  */
   //create a new location
   router.post('/location', passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
   (req,res) => {
@@ -411,47 +481,71 @@ vehicles (see below) are assigned to each rental location.
       if (obj){
         return res.status(400).send("This location name already exists "+obj);
       } else {
-        l = new locationDetails({name: req.body.name, adress: req.body.adress, vehicleCapacity: req.body.vehicleCapacity})
+        l = new locationDetails({name: req.body.name, adress: req.body.address, vehicleCapacity: req.body.vehicleCapacity})
         l.save();
         return res.send("Location saved");
       }
     })
   })
 
+  /*
+  endpoint : /location
+  request type : DELETE
+  query parameters : name
+  request body json : none
+  return : 200 location deleted
+           404 location not found
+           400 name missing
+           500 delte failed
+  NOTE : delete currently does not cascadingly delete the cars in the location.
+         We just set the cars to un assigned
+         We also do not take care of the bookings in the current location. What should be done??
+  */
   //delete a location
   router.delete('/location',passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
   (req,res) => {
-    locationDetails.findOne({ name: req.body.name}).then((l)=> {
-      if (l){
-        locationDetails.deleteOne(l).then((result)=> {
-          if (result.ok == 1){
-            //Remove all the cars assigned to this location
-            //TODO
-            vehicleDetails.updateMany({location: req.body.name}, {location: "UNASSIGNED"}).then(
-              (obj)=> {
-                if (obj.Matched ){
-                  if (obj.Modified){
-                    return res.send("Location deleted");
+    if (req.query.name){
+      locationDetails.findOne({ name: req.query.name}).then((l)=> {
+        if (l){
+          locationDetails.deleteOne(l).then((result)=> {
+            if (result.ok == 1){
+              //Remove all the cars assigned to this location
+              //TODO
+              vehicleDetails.updateMany({location: req.query.name}, {location: "UNASSIGNED"}).then(
+                (obj)=> {
+                  if (obj.Matched ){
+                    if (obj.Modified){
+                      return res.send("Location deleted");
+                    } else {
+                      //TODO should I rollback the location delete??
+                      return res.status(500).send("Delete failed. Server error");
+                    }
                   } else {
-                    //TODO should I rollback the location delete??
-                    return res.status(500).send("Delete failed. Server error");
+                    return res.send("Location deleted");
                   }
-                } else {
-                  return res.send("Location deleted");
-                }
-              });
-          } else {
-            return res.status(500).send("Delete failed");
-          }
-        })
-      } else {
-        return res.status(404).send("location not found");
-      }
-     })
+                });
+            } else {
+              return res.status(500).send("Delete failed");
+            }
+          })
+        } else {
+          return res.status(404).send("location not found");
+        }
+       })
+    } else {
+      return res.status(400).send("name missing");
+    }
    })
 
 
 
+  /*
+  endpoint : /bookings
+  request type : GET
+  query parameters : none
+  request body json : none
+  return :  200 returns the current users bookings which would be json array
+  */
   //return the bookings of current user
   router.get('/bookings', passport.authenticate('jwt', {session: false}), (req, res) => {
     bookingDetails.find({email: req.user.email}).then((b) => {
@@ -459,6 +553,14 @@ vehicles (see below) are assigned to each rental location.
     })
   });
 
+/*
+  endpoint : /booking
+  request type : GET
+  query parameters : bookingId 
+  request body json : none
+  return : 200 booking object
+           404 no such booking
+  */
 //find one booking of this user
 router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   if (!req.query.bookingId){
@@ -474,8 +576,21 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
   }
 });
 
+/*
+  endpoint : /booking
+  request type : POST
+  query parameters : registrationTag, checkOut, expectedCheckin
+  request body json : none
+  return : 200 bookingId
+           400 vehicle not available at this time
+           404 vehicle does not exist
+           500 server error
+  NOTE : currently this involves 3 independent mongo queries
+         TODO need to change that to single atomic opertaion using Mongo Transactions !!
+  */
 //create one booking for this user
 //check if this car is available at that time
+//TODO change this to transaction
 router.post('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   
   //check if vehicle exists
@@ -491,21 +606,24 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
             registrationTag: req.body.registrationTag,
             email: req.user.email, 
             checkOut: req.body.checkOut,
-            expectedCheckin: req.body.expectedCheckin,
-            registrationTag: req.body.registrationTag
+            cost: 0,
+            expectedCheckin: req.body.expectedCheckin
           });
-          b.save();
           UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
             if(obj.ok){
               //Modify vehicle details also
               vehicleDetails.updateOne({registrationTag: req.body.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
                 if (v.ok){
-                  return res.send('Created booking');
+                  b.cost = v.baseRate;
+                  b.save();
+                  return res.send(b._id);
                 } else {
                   //Rollback booking
                   //not safety checking
                   UserDetails.update({email: req.user.email}, { $pop: {bookings: b._id}}).then(()=>{
-                    return res.status(500).send("Booking failed");
+                    bookingDetails.deleteOne(b).then(()=> {
+                      return res.status(500).send("Booking failed");
+                    })
                   });
                 }
               })
@@ -520,13 +638,22 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
   }
   });
     } else {
-      console.log()
-      return res.status(400).send("This vehicle does not exist");
+      return res.status(404).send("This vehicle does not exist");
     }
   })
 });
 
-//update one booking
+/*
+  endpoint : /booking
+  request type : PUT
+  query parameters : bookingId 
+  request body json : isActive, checkOut, expectedCheckin, actualCheckin, feedback, complaints, paid
+  return : 200 updated booking object
+           400 missing bookingId parameter
+           404 booking not found
+  NOTE: We are not updating the cost factor - base rate remains the same but on return the price rate may increase??
+  */
+//update one booking -- Kind of like returning the car
 router.put('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   
   //need id
@@ -535,22 +662,39 @@ router.put('/booking', passport.authenticate('jwt', {session: false}), (req, res
   } else {
    //cost should be retrieved from vehicle
     bookingDetails.findOne({ email: req.user.email, "_id": req.query.bookingId }).then((b) => {
-      b.isActive = req.body.isActive;
-      b.checkOut = b.checkOut;
-      b.expectedCheckin = req.body.expectedCheckin;
-      b.actualCheckin = req.body.actualCheckin;
-      //for now cost is not updated
-      //base rate remains same but final cost is applied on return
-      //user.bookings.cost = req.body.cost;
-      b.feedback = req.body.feedback;
-      b.complaints = req.body.complaints;
-      b.paid = req.body.paid;
-      b.save();
-      return res.send("Booking updated");
+      if (b){
+        b.isActive = req.body.isActive;
+        b.checkOut = b.checkOut;
+        b.expectedCheckin = req.body.expectedCheckin;
+        b.actualCheckin = req.body.actualCheckin;
+        //for now cost is not updated
+        //base rate remains same but final cost is applied on return
+        //user.bookings.cost = req.body.cost;
+        b.feedback = req.body.feedback;
+        b.complaints = req.body.complaints;
+        b.paid = req.body.paid;
+        b.save();
+        return res.send(b);
+      } else {
+        return res.status(404).send("Booking not found");
+      }
     });
   }
 });
 
+/*
+  endpoint : /booking
+  request type : DELETE
+  query parameters : bookingId
+  request body json : none
+  return : We check if the time is 1 hour within the booking start time.
+           If yes we return 405 status with "Booking must be cancelled atleast one hour before"
+           Otherwise
+           200 booking cancelled
+           405 booking already started if booking already started
+           405 booking is not active
+           404 booking not found 
+  */
 //cancel a booking
 router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   //need id
@@ -559,12 +703,14 @@ router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, 
   } else {
     //before deletion check if its less than an hour before checkout
     //check if the booking is active also
-    bookingDetails.findOne({ email: req.user.email, "_id": req.query.bookingId}).then((b) => {
+    bookingDetails.findOne({ email: req.user.email, _id : req.query.bookingId}).then((b) => {
       if (b){
         if (b.isActive){
-          const today = Date();
-          const diffTime = b.checkout - today;
+          const today = new Date();
+          const checkOut = new Date(b.checkOut);
+          const diffTime = checkOut.getTime() - today.getTime();
           if (diffTime > 0){
+            //console.log(today.getTime(), diffTime, checkOut.getTime());
             const diffHours = Math.ceil(diffTime / (1000 * 60 * 60 )); 
             if (diffHours > 1){
               //donot delete, just change isActive to false for now
@@ -575,10 +721,13 @@ router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, 
               return res.status(405).send("Booking must be cancelled atleast one hour before");
             } 
           } else {
+            //console.log("Time difference");
+            //console.log(diffTime)
+            //console.log(today.getTime(), checkOut.getTime());
             return res.status(405).send("This booking has already started");
           }
         } else {
-          return res.status(405).send("This booking is not actives");
+          return res.status(405).send("This booking is not active");
         }
       } else{
         return res.status(404).send("Booking not found");
@@ -588,6 +737,19 @@ router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, 
   }
 });
 
+/*
+  endpoint : /return
+  request type : POST
+  query parameters : bookingId
+  request body json : none
+  return : 200 booking object
+           400 bookingId parameter missing
+           500 vehicle does not exist
+           405 booking has not started
+           405 booking is not active
+           404 booking not found
+  NOTE : TODO Need to check the cost calculation logic
+  */
 router.post('/return', passport.authenticate('jwt', {session: false}), (req, res) => {
   //need id
   if (!req.query.bookingId){
@@ -599,8 +761,9 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
       if (b){
         if (b.isActive){
           //is this return valid?
-          const today = Date();
-          const diffTime = b.checkout - today;
+          const today = new Date();
+          const checkOut = new Date(b.checkOut);
+          const diffTime = checkOut - today;
           if (diffTime < 0){
               const diffHours = Math.ceil(diffTime / (1000 * 60 * 60 )); 
               b.isActive = false;
@@ -613,13 +776,14 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
                   return res.status(500).send("This vehicle does not exist in inventory");
                 }
               })
+              b.paid = true;
               b.save();
-              return res.send("Return succesful");
+              return res.send(b);
             } else {
-              return res.status(405).send("Booking must be cancelled atleast one hour before");
+              return res.status(405).send("Booking must start before return");
             } 
           } else {
-            return res.status(405).send("This booking has not started yet");
+            return res.status(405).send("This booking is not active");
           }
         } else{
         return res.status(404).send("Booking not found");
@@ -628,6 +792,124 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
   }
 })
 
+/*
+  endpoint : /vehicles
+  request type : GET
+  query parameters : All are optional 
+                     location, type, manufacturer, condition, checkOut, expectedCheckin 
+  request body json : none 
+  return :  Array of vehicle objects available
+  NOTE : For the vehicles matching the filters, We check for bookings in the given tie window; 
+         If there are no bookings in the time window, then we add it to the array of vehicles available.
+         If checkOut and expectedCheckin is not given, then it simply checks for active bookings for the given vehicle
+  */
+//get vehicles 
+//can be done by anyone
+router.get('/vehicles', async (req,res) => {
+  console.log("Searching for vehicle");
+  var hrstart = process.hrtime();
+  var query = {};
+  var booking_query = {};
+  if (req.query.location){
+      query.location = req.query.location;
+  }
+  if (req.query.type){
+      query.type = req.query.type;
+  }
+  if (req.query.manufacturer){
+      query.manufacturer = req.query.manufacturer;
+  }
+  if (req.query.condition){
+      query.condition = req.query.condition;
+  }
+  if (req.query.checkOut){
+    booking_query.checkOut= {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}
+  }
+  if (req.query.expectedCheckin){
+    booking_query.expectedCheckin = {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}
+  }
+  booking_query.isActive = true;
+
+  //Now query and return the vehicle objects
+  console.log("Query is ", query);
+  console.log("Booking query", booking_query);
+
+  var available_cars = [];
+
+  async function find_bookings(v, booking_query){
+    booking_query.registrationTag = v.registrationTag;
+    var b = await bookingDetails.find(booking_query)
+    if (Array.isArray(b)&& (b.length == 0)){
+      //console.log("Car is free ",booking_query, b);
+      return v;
+    } else {
+      //console.log("This car is not free");
+      return;
+    }
+  }
+
+  async function asyncForEach(obj, booking_query){
+    for(let index=0; index < obj.length; index++){
+      booking_query.registrationTag = booking_query.registrationTag;
+      //available_cars.push()
+      var b = await find_bookings(obj[index], booking_query)
+      if (b){
+        available_cars.push(b);
+      }
+    }
+  }
+
+
+  async function find_cars(query, booking_query){
+    var obj = await vehicleDetails.find(query);
+    //console.log("obj is ",obj);
+  //check if this vehicle is free
+  if (obj){
+      //console.log(obj);
+      await asyncForEach(obj, booking_query);
+      //console.log("Looped ", available_cars);
+      return available_cars;
+    } else {
+      //console.log("Didn't even loop")
+      return available_cars;
+    }
+  }
+
+  var available_cars = await find_cars(query, booking_query);
+  console.log("Returning ", available_cars);
+  hrend = process.hrtime(hrstart)
+  console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+  return res.send(available_cars);
+    
+})
+
+
+//NON Router methods
+function isCarAvailable(vid, date_a, date_b){
+  //check if vehicle exists
+  var date1 = new Date(date_a);
+  var date2 = new Date(date_b);
+  return new Promise(resolve => {
+    vehicleDetails.findOne({registrationTag: vid}).then((obj)=> {
+      if (obj){
+        //find bookings with the given date range
+        bookingDetails.findOne({registrationTag: vid, isActive: true, checkOut: {$lte: date2, $gte: date1}, expectedCheckin: {$lte: date2, $gte: date1}}).then((v)=> {
+          if (v){
+            //there are active bookings in the given range
+            console.log("Booking conflict");
+            resolve("400");
+          } else {
+            resolve("200");
+          }
+        })
+  
+      } else {
+        resolve("404");
+      }
+  
+    })
+   })
+}
 
 //NON Router methods
 function isCarAvailable(vid, date_a, date_b){
