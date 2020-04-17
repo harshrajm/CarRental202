@@ -427,7 +427,7 @@ vehicles (see below) are assigned to each rental location.
   return :  Returns all the locations objects in db
             404 if no locaiton exists
   */
-  router.get('/locations', passport.authenticate('jwt', {session: false}), (req, res) => {
+  router.get('/locations', (req, res) => {
     locationDetails.find({}).then((obj) => {
       if (obj){
         return res.send(obj);
