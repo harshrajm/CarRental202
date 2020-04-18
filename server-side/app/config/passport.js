@@ -59,6 +59,7 @@ UserDetails.register({
 	"username": "joeexotic",
     "name": "Joe Exotic",
     "email": "joeexotic@bing.com",
+    "role": "Customer",
     "address": "JW Zoo, Oklhaoma, USA",
     "creditCard": "45776692102989",
     "creditCardIssuer": "VISA",
@@ -66,6 +67,8 @@ UserDetails.register({
     "creditCardNameonCard": "John Doe",
     "creditCardCVV": "518",
     "licenseState": "Oklahoma",
+    "membershipActive": true,
+    "membershipEndDate": "2020-09-19",
     "profilePictureURL": "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F20%2F2020%2F04%2F03%2Fzoom-1.jpg",
     "licenseNumber": "7755AXD"
 }, '123456');

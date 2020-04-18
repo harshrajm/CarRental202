@@ -34,3 +34,7 @@ var router = require("./app/routes/router");
 app.use(router);
 app.listen(port);
 console.log(`Server running at http://${hostname}:${port}/`);
+
+//cron jobs / tasks
+var task = require('./app/tasks/tasks').job;
+task.start();

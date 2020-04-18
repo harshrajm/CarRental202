@@ -17,6 +17,7 @@ const UserSchema = new Schema({
     creditCardCVV: String,
     licenseState: String,
     licenseNumber: String,
+    membershipActive: Boolean,
     membershipEndDate: Date,
     profilePictureURL: String,
     bookings:  { type: Array, "default": [] }

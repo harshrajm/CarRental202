@@ -25,7 +25,6 @@ router.post('/register', (req, res) => {
         //console.log(req.body);
         var d = new Date();
         //membership end date is 6 months from now
-        //TODO why is creditcard info not being saved?
         d.setMonth(d.getMonth() + 6);
         const user = new UserDetails({
           username: req.body.username,
@@ -42,6 +41,7 @@ router.post('/register', (req, res) => {
           licenseNumber: req.body.licenseNumber,
           profilePictureURL: req.body.profilePictureURL,
           membershipEndDate: d,
+          membershipActive: true,
         });
         console.log(user);
         UserDetails.register(user, req.body.password, (result)=> res.send("User registered"));
@@ -167,15 +167,20 @@ router.post('/register', (req, res) => {
   (req, res) => {
     UserDetails.findOne({email: req.user.email}).then((user) => {
       if (user){
-        var d = Date(user.membershipEndDate);
-        d.setMonth(d.getMonth() + 6);
-        UserDetails.updateOne({email: req.body.email}, {membershipEndDate: d }).then((obj)=> {
+        var d = Date(user.membershipEndDate); 
+        if (user.membershipActive){
+          d.setMonth(d.getMonth() + 6);
+        } else {
+          d = Date();
+          d.setMonth(d.getMonth() + 6);
+        }
+        UserDetails.updateOne({email: req.body.email}, {membershipEndDate: d, membershipActive: true }).then((obj)=> {
           if (obj.ok != 1){
-            console.log("Object delete error");
+            console.log("Object update error");
             console.log(err);
-            res.status(500).send('User delete failed');
+            res.status(500).send('User update failed');
           } else {
-            res.send('User deleted');
+            res.send('Membership extended');
             //user should be redirected by UI
           }
         }
@@ -585,6 +590,7 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
            400 vehicle not available at this time
            404 vehicle does not exist
            500 server error
+           403 please renew your membership
   NOTE : currently this involves 3 independent mongo queries
          TODO need to change that to single atomic opertaion using Mongo Transactions !!
   */
@@ -593,52 +599,59 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
 //TODO change this to transaction
 router.post('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   
-  //check if vehicle exists
-  vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((v)=>{
-    if (v){
-        //check if there is already a booking
-        isCarAvailable(req.body.registrationTag, req.body.checkOut, req.body.expectedCheckin ).then((available)=> {
-        if (available.localeCompare("200") == 0){
-          //generate an id
-          //cost should be retrieved from vehicle
-          var b = new bookingDetails({
-            isActive: true,
-            registrationTag: req.body.registrationTag,
-            email: req.user.email, 
-            checkOut: req.body.checkOut,
-            cost: 0,
-            expectedCheckin: req.body.expectedCheckin
-          });
-          UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
-            if(obj.ok){
-              //Modify vehicle details also
-              vehicleDetails.updateOne({registrationTag: req.body.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
-                if (v.ok){
-                  b.cost = v.baseRate;
-                  b.save();
-                  return res.send(b._id);
-                } else {
-                  //Rollback booking
-                  //not safety checking
-                  UserDetails.update({email: req.user.email}, { $pop: {bookings: b._id}}).then(()=>{
-                    bookingDetails.deleteOne(b).then(()=> {
-                      return res.status(500).send("Booking failed");
-                    })
-                  });
-                }
-              })
+  //if user account is not active don't allow booking
+  var user = UserDetails.findOne({ email: req.user.email}).then(()=> {
+    if (user.membershipActive){
+      //check if vehicle exists
+      vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((v)=>{
+        if (v){
+            //check if there is already a booking
+            isCarAvailable(req.body.registrationTag, req.body.checkOut, req.body.expectedCheckin ).then((available)=> {
+            if (available.localeCompare("200") == 0){
+              //generate an id
+              //cost should be retrieved from vehicle
+              var b = new bookingDetails({
+                isActive: true,
+                registrationTag: req.body.registrationTag,
+                email: req.user.email, 
+                checkOut: req.body.checkOut,
+                cost: 0,
+                expectedCheckin: req.body.expectedCheckin
+              });
+              UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
+                if(obj.ok){
+                  //Modify vehicle details also
+                  vehicleDetails.updateOne({registrationTag: req.body.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
+                    if (v.ok){
+                      b.cost = v.baseRate;
+                      b.save();
+                      return res.send(b._id);
+                    } else {
+                      //Rollback booking
+                      //not safety checking
+                      UserDetails.update({email: req.user.email}, { $pop: {bookings: b._id}}).then(()=>{
+                        bookingDetails.deleteOne(b).then(()=> {
+                          return res.status(500).send("Booking failed");
+                        })
+                      });
+                    }
+                  })
+          } else {
+            return res.status(500).send('Server error');
+          }
+        });
       } else {
-        return res.status(500).send('Server error');
+        //This is when you need to suggest other cars
+        //That can be a different call from the client side
+        return res.status(400).send("vehicle not available at this time");
       }
-    });
-  } else {
-    //This is when you need to suggest other cars
-    //That can be a different call from the client side
-    return res.status(400).send("vehicle not available at this time");
-  }
-  });
+      });
+        } else {
+          return res.status(404).send("This vehicle does not exist");
+        }
+      })
     } else {
-      return res.status(404).send("This vehicle does not exist");
+      res.status(403).send("Please renew your membership before booking");
     }
   })
 });
