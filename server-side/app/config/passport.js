@@ -53,6 +53,8 @@ function (jwtPayload, cb) {
 ));
 
 /* REGISTER ADMIN USERS, Regular USER and some cars */
+/* admin username password admin/admin */
+/* Customer username password joeexotic/123456 */
 
 UserDetails.register({username:'admin', active: false, role:'Admin'}, 'admin');
 UserDetails.register({
@@ -91,7 +93,7 @@ var v = new VehicleDetails({
   "lastService": "2020-04-12T08:00:00.000Z",
   "vehicleImageURL": "https://i.ebayimg.com/images/g/l-UAAOSwlwldSQab/s-l1600.jpg",
   "condition": "mint",
-  "baseRate": 120})
+  "baseRate": 120});
 
   var v2 = new VehicleDetails({
     "hourlyRate": [
@@ -119,7 +121,7 @@ var v = new VehicleDetails({
       "vehicleCapacity": 5
       });
     
-      var v3 =       v = new VehicleDetails({
+      var v3 = new VehicleDetails({
         "hourlyRate": [
             45,
             55,
