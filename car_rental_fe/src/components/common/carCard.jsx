@@ -19,10 +19,15 @@ class CarCard extends Component {
             </div>
             <div className="col-md-8 ">
               <div className="card-block p-3">
+                {/* <small className="float-right font-weight-light">Starting from</small>
+                <br /> */}
                 <h4 className="card-title float-right">
                   <FaDollarSign />
-                  120/hr
+                  120<small>/hr</small>
                 </h4>
+                <small className="float-right mt-2 font-weight-light">
+                  Starting from :
+                </small>
                 <h3 className="card-title">Tesla model S</h3>
                 <hr />
                 <span class="badge badge-light">Sedan</span>
@@ -55,10 +60,17 @@ class CarCard extends Component {
             </div>
             <div className="col-md-8 ">
               <div className="card-block p-3">
+                {/* <small className="float-right font-weight-light">
+                  Starting from
+                </small>
+                <br /> */}
                 <h4 className="card-title float-right">
                   <FaDollarSign />
-                  120/hr
+                  150<small>/hr</small>
                 </h4>
+                <small className="float-right mt-2 font-weight-light">
+                  Starting from :
+                </small>
                 <h3 className="card-title">Tesla Cybertruck</h3>
                 <hr />
                 <span class="badge badge-light">SUV</span>
@@ -72,7 +84,7 @@ class CarCard extends Component {
                   Not Available
                 </span>
                 <button type="button" className="btn btn-link  float-right">
-                  Find Tesla Cybertruck at other locations
+                  Find SUV at other locations
                 </button>
               </div>
             </div>

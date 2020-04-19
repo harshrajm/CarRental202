@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import CarCard from "./common/carCard";
+import CarSearchForm from "./carSearchForm";
 
 class CarBooking extends Component {
   state = {};
   render() {
     return (
       <React.Fragment>
-        <h2>Car Booking Component</h2>
+        <CarSearchForm />
         <CarCard />
       </React.Fragment>
     );
