@@ -610,13 +610,15 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
             if (available.localeCompare("200") == 0){
               //generate an id
               //cost should be retrieved from vehicle
+              var expectedCheckinDate = new Date(req.body.expectedCheckin);
+              var checkOutDate = new Date(req.body.checkOut);
               var b = new bookingDetails({
                 isActive: true,
                 registrationTag: req.body.registrationTag,
                 email: req.user.email, 
-                checkOut: req.body.checkOut,
+                checkOut: checkOutDate,
                 cost: 0,
-                expectedCheckin: req.body.expectedCheckin
+                expectedCheckin: expectedCheckinDate
               });
               UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
@@ -784,6 +786,7 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
               vehicleDetails.findOne({ registrationTag: b.registrationTag}).then((v)=>{
                 if (v){
                   //TODO fix formula
+                  //TODO apply late fees
                   b.cost = b.cost + (diffHours * v.hourlyRate);
                 } else {
                   return res.status(500).send("This vehicle does not exist in inventory");
@@ -823,6 +826,7 @@ router.get('/vehicles', async (req,res) => {
   var hrstart = process.hrtime();
   var query = {};
   var booking_query = {};
+  var numberOfHours = 0;
   if (req.query.location){
       query.location = req.query.location;
   }
@@ -840,6 +844,8 @@ router.get('/vehicles', async (req,res) => {
   }
   if (req.query.expectedCheckin){
     booking_query.expectedCheckin = {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}
+    numberOfHours = (new Date(req.query.expectedCheckin)).getTime() - (new Date(req.query.checkOut)).getTime();
+    numberOfHours = Math.ceil(numberOfHours / (1000 * 60 * 60 )); 
   }
   booking_query.isActive = true;
 
@@ -867,6 +873,9 @@ router.get('/vehicles', async (req,res) => {
       //available_cars.push()
       var b = await find_bookings(obj[index], booking_query)
       if (b){
+        var finalRate = {finalRate: b.baseRate + numberOfHours * b.hourlyRate[Math.floor(numberOfHours/5)%14]};
+        //super sketchy 
+        b._doc = {...b._doc, ...finalRate};
         available_cars.push(b);
       }
     }

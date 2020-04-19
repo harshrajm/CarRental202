@@ -77,11 +77,21 @@ UserDetails.register({
 
 var v = new VehicleDetails({
   "hourlyRate": [
-      45,
-      55,
-      65,
-      32,
-      12
+    50,
+    45,
+    43,
+    38,
+    32,
+    28,
+    26,
+    24,
+    22,
+    20,
+    18,
+    16,
+    14,
+    12,
+    10
   ],
   "type": "Sedan",
   "location": "San Jose",
@@ -97,11 +107,21 @@ var v = new VehicleDetails({
 
   var v2 = new VehicleDetails({
     "hourlyRate": [
-        45,
-        55,
-        65,
-        32,
-        12
+      45,
+      38,
+      36,
+      34,
+      32,
+      30,
+      28,
+      26,
+      24,
+      22,
+      20,
+      18,
+      16,
+      14,
+      12
     ],
     "type": "SUV",
     "location": "San Jose",
@@ -123,11 +143,21 @@ var v = new VehicleDetails({
     
       var v3 = new VehicleDetails({
         "hourlyRate": [
-            45,
-            55,
-            65,
+            38,
+            36,
+            34,
             32,
-            12
+            30,
+            28,
+            26,
+            24,
+            22,
+            20,
+            18,
+            16,
+            14,
+            12,
+            10
         ],
         "type": "SUV",
         "location": "Santa Clara",
