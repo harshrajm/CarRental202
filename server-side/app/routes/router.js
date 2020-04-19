@@ -816,10 +816,14 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
   request body json : none 
   return :  Array of vehicle objects available
   NOTE : For the vehicles matching the filters, We check for bookings in the given tie window; 
-         If there are no bookings in the time window, then we add it to the array of vehicles available.
+         If there are no bookings in the time window, then we add a field isAvailable with true value to the document.
+         Otherise we set isAvailable to false in the document.
          If checkOut and expectedCheckin is not given, then it simply checks for active bookings for the given vehicle
   */
 //get vehicles 
+//Updated the search so that all the vehicles mathcing the criteria are returned with a boolean
+//isAvailable set to true or false
+//that way only will we be able to suggest find similar cars
 //can be done by anyone
 router.get('/vehicles', async (req,res) => {
   console.log("Searching for vehicle");
@@ -860,9 +864,15 @@ router.get('/vehicles', async (req,res) => {
     var b = await bookingDetails.find(booking_query)
     if (Array.isArray(b)&& (b.length == 0)){
       //console.log("Car is free ",booking_query, b);
+      var finalRate = {finalRate: v.baseRate + numberOfHours * v.hourlyRate[Math.floor(numberOfHours/5)%14]};
+      var isAvailable = {isAvailable: true};
+      //super sketchy
+      v._doc = {...v._doc, ...finalRate, ...isAvailable}
       return v;
     } else {
       //console.log("This car is not free");
+      var isAvailable = {isAvailable: false};
+      v._doc = {...v._doc, ...isAvailable};
       return;
     }
   }
@@ -873,9 +883,6 @@ router.get('/vehicles', async (req,res) => {
       //available_cars.push()
       var b = await find_bookings(obj[index], booking_query)
       if (b){
-        var finalRate = {finalRate: b.baseRate + numberOfHours * b.hourlyRate[Math.floor(numberOfHours/5)%14]};
-        //super sketchy 
-        b._doc = {...b._doc, ...finalRate};
         available_cars.push(b);
       }
     }
@@ -898,7 +905,7 @@ router.get('/vehicles', async (req,res) => {
   }
 
   var available_cars = await find_cars(query, booking_query);
-  console.log("Returning ", available_cars);
+  //console.log("Returning ", available_cars);
   hrend = process.hrtime(hrstart)
   console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
   return res.send(available_cars);
