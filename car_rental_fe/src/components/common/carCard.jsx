@@ -6,7 +6,7 @@ class CarCard extends Component {
   render() {
     return (
       <React.Fragment>
-        <div className="card m-2">
+        <div className="card m-4">
           <div className="row ">
             <div className="col-md-4">
               <img
@@ -30,7 +30,7 @@ class CarCard extends Component {
                 </small>
                 <h3 className="card-title">Tesla model S</h3>
                 <hr />
-                <span class="badge badge-light">Sedan</span>
+                <span className="badge badge-light">Sedan</span>
                 <p className="card-text float-right">
                   <MdLocationOn />
                   San Jose
@@ -47,7 +47,7 @@ class CarCard extends Component {
             </div>
           </div>
         </div>
-        <div className="card m-2">
+        <div className="card m-4">
           <div className="row ">
             <div className="col-md-4">
               <img
@@ -73,7 +73,7 @@ class CarCard extends Component {
                 </small>
                 <h3 className="card-title">Tesla Cybertruck</h3>
                 <hr />
-                <span class="badge badge-light">SUV</span>
+                <span className="badge badge-light">SUV</span>
                 <p className="card-text float-right">
                   <MdLocationOn />
                   San Jose

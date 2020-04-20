@@ -435,6 +435,7 @@ vehicles (see below) are assigned to each rental location.
   router.get('/locations', (req, res) => {
     locationDetails.find({}).then((obj) => {
       if (obj){
+        
         return res.send(obj);
       } else {
         return res.status(404).send("No locations exist");
