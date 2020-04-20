@@ -15,6 +15,16 @@ class CarBooking extends Component {
     this.setState({ vehicles: null, searchParam: null });
   };
 
+  handleBookClick = id => {
+    //if not auth redirect
+    if (!this.props.user) {
+      alert("Login to book");
+    } else {
+      alert("id " + id + " clicked");
+    }
+    //handle book click
+  };
+
   render() {
     if (!this.state.vehicles) {
       return <CarSearchForm onVehiclesUpdate={this.handleVehiclesUpdate} />;
@@ -32,14 +42,14 @@ class CarBooking extends Component {
             <div className="col-3">
               <span className="badge badge-light">Start Time</span>
               <br />
-              {moment(this.state.searchParam["expectedCheckin"]).format(
+              {moment(this.state.searchParam["checkOut"]).format(
                 "ddd MMM DD HH:mm"
               )}
             </div>
             <div className="col-3">
               <span className="badge badge-light">End Time</span>
               <br />
-              {moment(this.state.searchParam["checkOut"]).format(
+              {moment(this.state.searchParam["expectedCheckin"]).format(
                 "ddd MMM DD HH:mm"
               )}
             </div>
@@ -57,11 +67,17 @@ class CarBooking extends Component {
         </React.Fragment>
         {this.state.vehicles.map(v => (
           <CarCard
+            _id={v._id}
             manu={v.manufacturer}
             name={v.name}
-            img={v.vehicleImageURL}
+            imgUrl={v.vehicleImageURL}
             type={v.type}
             location={v.location}
+            rate={v.finalRate}
+            isAvailable={v.isAvailable}
+            baseRate={v.baseRate}
+            hourlyRate={v.hourlyRate}
+            onBookClick={this.handleBookClick}
           />
         ))}
         {/* <CarCard /> */}

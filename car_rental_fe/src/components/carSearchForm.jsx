@@ -74,8 +74,8 @@ class CarSearchForm extends Component {
     //call backend
     try {
       const data = {};
-      data["expectedCheckin"] = this.state.data.startDate;
-      data["checkOut"] = this.state.data.endDate;
+      data["expectedCheckin"] = this.state.data.endDate;
+      data["checkOut"] = this.state.data.startDate;
       data["location"] = this.state.data.selectedLocation;
       //console.log("toBeSent", data);
       const { data: vehicles } = await getVehicles(qs.stringify(data));
@@ -130,6 +130,7 @@ class CarSearchForm extends Component {
                         onChange={this.onChangeStartDate}
                         value={this.state.data.startDate}
                         name="startDate"
+                        clearIcon={null}
                       />
                     </div>
                   </div>
@@ -141,6 +142,7 @@ class CarSearchForm extends Component {
                         onChange={this.onChangeEndDate}
                         value={this.state.data.endDate}
                         name="endDate"
+                        clearIcon={null}
                       />
                     </div>
                   </div>
