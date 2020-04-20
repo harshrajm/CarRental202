@@ -611,13 +611,15 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
             if (available.localeCompare("200") == 0){
               //generate an id
               //cost should be retrieved from vehicle
+              var expectedCheckinDate = new Date(req.body.expectedCheckin);
+              var checkOutDate = new Date(req.body.checkOut);
               var b = new bookingDetails({
                 isActive: true,
                 registrationTag: req.body.registrationTag,
                 email: req.user.email, 
-                checkOut: req.body.checkOut,
+                checkOut: checkOutDate,
                 cost: 0,
-                expectedCheckin: req.body.expectedCheckin
+                expectedCheckin: expectedCheckinDate
               });
               UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
@@ -785,6 +787,7 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
               vehicleDetails.findOne({ registrationTag: b.registrationTag}).then((v)=>{
                 if (v){
                   //TODO fix formula
+                  //TODO apply late fees
                   b.cost = b.cost + (diffHours * v.hourlyRate);
                 } else {
                   return res.status(500).send("This vehicle does not exist in inventory");
@@ -814,16 +817,21 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
   request body json : none 
   return :  Array of vehicle objects available
   NOTE : For the vehicles matching the filters, We check for bookings in the given tie window; 
-         If there are no bookings in the time window, then we add it to the array of vehicles available.
+         If there are no bookings in the time window, then we add a field isAvailable with true value to the document.
+         Otherise we set isAvailable to false in the document.
          If checkOut and expectedCheckin is not given, then it simply checks for active bookings for the given vehicle
   */
 //get vehicles 
+//Updated the search so that all the vehicles mathcing the criteria are returned with a boolean
+//isAvailable set to true or false
+//that way only will we be able to suggest find similar cars
 //can be done by anyone
 router.get('/vehicles', async (req,res) => {
   console.log("Searching for vehicle");
   var hrstart = process.hrtime();
   var query = {};
   var booking_query = {};
+  var numberOfHours = 0;
   if (req.query.location){
       query.location = req.query.location;
   }
@@ -841,6 +849,8 @@ router.get('/vehicles', async (req,res) => {
   }
   if (req.query.expectedCheckin){
     booking_query.expectedCheckin = {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}
+    numberOfHours = (new Date(req.query.expectedCheckin)).getTime() - (new Date(req.query.checkOut)).getTime();
+    numberOfHours = Math.ceil(numberOfHours / (1000 * 60 * 60 )); 
   }
   booking_query.isActive = true;
 
@@ -855,9 +865,15 @@ router.get('/vehicles', async (req,res) => {
     var b = await bookingDetails.find(booking_query)
     if (Array.isArray(b)&& (b.length == 0)){
       //console.log("Car is free ",booking_query, b);
+      var finalRate = {finalRate: v.baseRate + numberOfHours * v.hourlyRate[Math.floor(numberOfHours/5)%14]};
+      var isAvailable = {isAvailable: true};
+      //super sketchy
+      v._doc = {...v._doc, ...finalRate, ...isAvailable}
       return v;
     } else {
       //console.log("This car is not free");
+      var isAvailable = {isAvailable: false};
+      v._doc = {...v._doc, ...isAvailable};
       return;
     }
   }
@@ -890,7 +906,7 @@ router.get('/vehicles', async (req,res) => {
   }
 
   var available_cars = await find_cars(query, booking_query);
-  console.log("Returning ", available_cars);
+  //console.log("Returning ", available_cars);
   hrend = process.hrtime(hrstart)
   console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
   return res.send(available_cars);
