@@ -600,21 +600,21 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
 router.post('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   
   //if user account is not active don't allow booking
-  var user = UserDetails.findOne({ email: req.user.email}).then(()=> {
+  UserDetails.findOne({ email: req.user.email}).then((user)=> {
     if (user.membershipActive){
       //check if vehicle exists
-      vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((v)=>{
+      vehicleDetails.findOne({registrationTag: req.query.registrationTag}).then((v)=>{
         if (v){
             //check if there is already a booking
-            isCarAvailable(req.body.registrationTag, req.body.checkOut, req.body.expectedCheckin ).then((available)=> {
+            isCarAvailable(req.query.registrationTag, req.query.checkOut, req.query.expectedCheckin ).then((available)=> {
             if (available.localeCompare("200") == 0){
               //generate an id
               //cost should be retrieved from vehicle
-              var expectedCheckinDate = new Date(req.body.expectedCheckin);
-              var checkOutDate = new Date(req.body.checkOut);
+              var expectedCheckinDate = new Date(req.query.expectedCheckin);
+              var checkOutDate = new Date(req.query.checkOut);
               var b = new bookingDetails({
                 isActive: true,
-                registrationTag: req.body.registrationTag,
+                registrationTag: req.query.registrationTag,
                 email: req.user.email, 
                 checkOut: checkOutDate,
                 cost: 0,
@@ -623,7 +623,7 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
               UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
                   //Modify vehicle details also
-                  vehicleDetails.updateOne({registrationTag: req.body.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
+                  vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
                     if (v.ok){
                       b.cost = v.baseRate;
                       b.save();
@@ -922,7 +922,7 @@ function isCarAvailable(vid, date_a, date_b){
     vehicleDetails.findOne({registrationTag: vid}).then((obj)=> {
       if (obj){
         //find bookings with the given date range
-        bookingDetails.findOne({registrationTag: vid, isActive: true, checkOut: {$lte: date2, $gte: date1}, expectedCheckin: {$lte: date2, $gte: date1}}).then((v)=> {
+        bookingDetails.findOne({registrationTag: vid, isActive: true, $or: [{checkOut: {$lte: date2, $gte: date1}}, {expectedCheckin: {$lte: date2, $gte: date1}}] }).then((v)=> {
           if (v){
             //there are active bookings in the given range
             console.log("Booking conflict");
@@ -939,33 +939,5 @@ function isCarAvailable(vid, date_a, date_b){
     })
    })
 }
-
-//NON Router methods
-function isCarAvailable(vid, date_a, date_b){
-  //check if vehicle exists
-  var date1 = new Date(date_a);
-  var date2 = new Date(date_b);
-  return new Promise(resolve => {
-    vehicleDetails.findOne({registrationTag: vid}).then((obj)=> {
-      if (obj){
-        //find bookings with the given date range
-        bookingDetails.findOne({registrationTag: vid, isActive: true, checkOut: {$lte: date2, $gte: date1}, expectedCheckin: {$lte: date2, $gte: date1}}).then((v)=> {
-          if (v){
-            //there are active bookings in the given range
-            console.log("Booking conflict");
-            resolve("400");
-          } else {
-            resolve("200");
-          }
-        })
-  
-      } else {
-        resolve("404");
-      }
-  
-    })
-   })
-}
-
 
 module.exports = router;
