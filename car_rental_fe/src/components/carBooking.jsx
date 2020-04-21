@@ -3,6 +3,8 @@ import CarCard from "./common/carCard";
 import CarSearchForm from "./carSearchForm";
 import moment from "moment";
 import { IoIosCloseCircle } from "react-icons/io";
+import { postNewBooking } from "../services/backendCallService";
+import qs from "query-string";
 
 class CarBooking extends Component {
   state = {};
@@ -15,12 +17,25 @@ class CarBooking extends Component {
     this.setState({ vehicles: null, searchParam: null });
   };
 
-  handleBookClick = id => {
+  handleBookClick = async (id, registrationTag) => {
     //if not auth redirect
     if (!this.props.user) {
-      alert("Login to book");
+      //window.location = "/login";
+      this.props.history.push("/login");
+      //alert("Login to book");
     } else {
-      alert("id " + id + " clicked");
+      //alert("registrationTag " + registrationTag + " clicked");
+      const data = {};
+      data["registrationTag"] = registrationTag;
+      data["checkOut"] = this.state.searchParam.checkOut;
+      data["expectedCheckin"] = this.state.searchParam.expectedCheckin;
+      try {
+        await postNewBooking(qs.stringify(data));
+        console.log("booking placed");
+        this.props.history.push("/myBookings");
+      } catch (ex) {
+        console.log("error in postNewBooking");
+      }
     }
     //handle book click
   };
@@ -56,7 +71,7 @@ class CarBooking extends Component {
             <div className="col-3">
               <button
                 type="button"
-                class="btn btn-light float-right"
+                className="btn btn-light float-right"
                 onClick={this.handleClearSearch}
               >
                 Clear search <IoIosCloseCircle />
@@ -67,6 +82,7 @@ class CarBooking extends Component {
         </React.Fragment>
         {this.state.vehicles.map(v => (
           <CarCard
+            key={v._id}
             _id={v._id}
             manu={v.manufacturer}
             name={v.name}
@@ -78,6 +94,7 @@ class CarBooking extends Component {
             baseRate={v.baseRate}
             hourlyRate={v.hourlyRate}
             onBookClick={this.handleBookClick}
+            registrationTag={v.registrationTag}
           />
         ))}
         {/* <CarCard /> */}

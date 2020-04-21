@@ -15,7 +15,8 @@ class CarCard extends Component {
       isAvailable,
       baseRate,
       hourlyRate,
-      onBookClick
+      onBookClick,
+      registrationTag
     } = this.props;
     return (
       <React.Fragment>
@@ -68,7 +69,7 @@ class CarCard extends Component {
                   <button
                     type="button"
                     className="btn btn-primary  float-right"
-                    onClick={() => onBookClick(_id)}
+                    onClick={() => onBookClick(_id, registrationTag)}
                   >
                     Book
                   </button>

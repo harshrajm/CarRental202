@@ -8,3 +8,7 @@ export function getLocation() {
 export function getVehicles(queryString) {
   return http.get(apiUrl + "/vehicles?" + queryString);
 }
+
+export function postNewBooking(queryString) {
+  return http.post(apiUrl + "/booking?" + queryString);
+}
