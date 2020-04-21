@@ -28,7 +28,10 @@ class App extends Component {
             <Route path="/register" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={Logout} />
-            <Route path="/book" component={CarBooking} />
+            <Route
+              path="/book"
+              render={props => <CarBooking {...props} user={user} />}
+            />
             {/* <Route path="/myBookings" component={MyBookingsComponent} /> */}
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/book" />

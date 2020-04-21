@@ -24,9 +24,9 @@ class LoginForm extends Component {
       const { data } = this.state;
       await auth.login(data);
       //go back to what the user was doing
-      //const { state } = this.props.location;
-      //window.location = state ? state.from.pathname : "/";
-      window.location = "/";
+      const { state } = this.props.location;
+      window.location = state ? state.from.pathname : "/";
+      //window.location = "/";
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");
