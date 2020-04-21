@@ -618,14 +618,16 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
                 registrationTag: req.query.registrationTag,
                 email: req.user.email, 
                 checkOut: checkOutDate,
+                vehicleObject: {name: v.name, manufacturer: v.manufacturer, registrationTag: v.registrationTag,
+                  vehicleImageURL: v.vehicleImageURL, type: v.type },
                 cost: 0,
                 expectedCheckin: expectedCheckinDate
               });
               UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
                   //Modify vehicle details also
-                  vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
-                    if (v.ok){
+                  vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((k)=>{
+                    if (k.ok){
                       b.cost = v.baseRate;
                       b.save();
                       return res.send(b._id);

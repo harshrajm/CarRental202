@@ -10,7 +10,7 @@ const Booking = new Schema({
     registrationTag: String,
     actualCheckin: {type: Date, default: null},
     cost: Number,
-    vehicleId: Number,
+    vehicleObject: JSON,
     feedback: String,
     complaints: String,
     paid: { type: Boolean, default: false }
