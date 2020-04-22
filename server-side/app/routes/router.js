@@ -634,9 +634,10 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
                 cost: 0,
                 expectedCheckin: expectedCheckinDate
               });
-              UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
+              UserDetails.updateOne({ email: req.query.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
                   //Modify vehicle details also
+
                   vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((k)=>{
                     if (k.ok){
                       b.cost = v.baseRate;
