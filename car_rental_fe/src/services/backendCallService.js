@@ -12,3 +12,7 @@ export function getVehicles(queryString) {
 export function postNewBooking(queryString) {
   return http.post(apiUrl + "/booking?" + queryString);
 }
+
+export function getBookings() {
+  return http.get(apiUrl + "/bookings");
+}

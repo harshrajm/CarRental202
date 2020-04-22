@@ -601,30 +601,30 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
 router.post('/booking', passport.authenticate('jwt', {session: false}), (req, res) => {
   
   //if user account is not active don't allow booking
-  var user = UserDetails.findOne({ email: req.user.email}).then(()=> {
+  UserDetails.findOne({ email: req.user.email}).then((user)=> {
     if (user.membershipActive){
       //check if vehicle exists
-      vehicleDetails.findOne({registrationTag: req.body.registrationTag}).then((v)=>{
+      vehicleDetails.findOne({registrationTag: req.query.registrationTag}).then((v)=>{
         if (v){
             //check if there is already a booking
-            isCarAvailable(req.body.registrationTag, req.body.checkOut, req.body.expectedCheckin ).then((available)=> {
+            isCarAvailable(req.query.registrationTag, req.query.checkOut, req.query.expectedCheckin ).then((available)=> {
             if (available.localeCompare("200") == 0){
               //generate an id
               //cost should be retrieved from vehicle
-              var expectedCheckinDate = new Date(req.body.expectedCheckin);
-              var checkOutDate = new Date(req.body.checkOut);
+              var expectedCheckinDate = new Date(req.query.expectedCheckin);
+              var checkOutDate = new Date(req.query.checkOut);
               var b = new bookingDetails({
                 isActive: true,
-                registrationTag: req.body.registrationTag,
+                registrationTag: req.query.registrationTag,
                 email: req.user.email, 
                 checkOut: checkOutDate,
                 cost: 0,
                 expectedCheckin: expectedCheckinDate
               });
-              UserDetails.updateOne({ email: req.user.email}, { $push: { bookings: b._id } }).then((obj)=>{
+              UserDetails.updateOne({ email: req.query.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
                   //Modify vehicle details also
-                  vehicleDetails.updateOne({registrationTag: req.body.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
+                  vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
                     if (v.ok){
                       b.cost = v.baseRate;
                       b.save();

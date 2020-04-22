@@ -6,6 +6,7 @@ import NotFound from "./components/notFound";
 import RegisterForm from "./components/registerForm";
 import LoginForm from "./components/loginForm";
 import Logout from "./components/logout";
+import MyBooking from "./components/myBooking";
 import auth from "./services/authService";
 import "./App.css";
 
@@ -32,7 +33,11 @@ class App extends Component {
               path="/book"
               render={props => <CarBooking {...props} user={user} />}
             />
-            {/* <Route path="/myBookings" component={MyBookingsComponent} /> */}
+            <Route
+              path="/myBookings"
+              render={props => <MyBooking {...props} user={user} />}
+            />
+
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/book" />
             <Redirect to="/not-found" />
