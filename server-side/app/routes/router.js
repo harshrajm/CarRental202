@@ -618,14 +618,17 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
                 registrationTag: req.query.registrationTag,
                 email: req.user.email, 
                 checkOut: checkOutDate,
+                vehicleObject: {name: v.name, manufacturer: v.manufacturer, registrationTag: v.registrationTag,
+                  vehicleImageURL: v.vehicleImageURL, type: v.type },
                 cost: 0,
                 expectedCheckin: expectedCheckinDate
               });
               UserDetails.updateOne({ email: req.query.email}, { $push: { bookings: b._id } }).then((obj)=>{
                 if(obj.ok){
                   //Modify vehicle details also
-                  vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((v)=>{
-                    if (v.ok){
+
+                  vehicleDetails.updateOne({registrationTag: req.query.registrationTag}, { $push: { bookings: b._id } }).then((k)=>{
+                    if (k.ok){
                       b.cost = v.baseRate;
                       b.save();
                       return res.send(b._id);
@@ -923,7 +926,7 @@ function isCarAvailable(vid, date_a, date_b){
     vehicleDetails.findOne({registrationTag: vid}).then((obj)=> {
       if (obj){
         //find bookings with the given date range
-        bookingDetails.findOne({registrationTag: vid, isActive: true, checkOut: {$lte: date2, $gte: date1}, expectedCheckin: {$lte: date2, $gte: date1}}).then((v)=> {
+        bookingDetails.findOne({registrationTag: vid, isActive: true, $or: [{checkOut: {$lte: date2, $gte: date1}}, {expectedCheckin: {$lte: date2, $gte: date1}}] }).then((v)=> {
           if (v){
             //there are active bookings in the given range
             console.log("Booking conflict");
@@ -940,33 +943,5 @@ function isCarAvailable(vid, date_a, date_b){
     })
    })
 }
-
-//NON Router methods
-function isCarAvailable(vid, date_a, date_b){
-  //check if vehicle exists
-  var date1 = new Date(date_a);
-  var date2 = new Date(date_b);
-  return new Promise(resolve => {
-    vehicleDetails.findOne({registrationTag: vid}).then((obj)=> {
-      if (obj){
-        //find bookings with the given date range
-        bookingDetails.findOne({registrationTag: vid, isActive: true, checkOut: {$lte: date2, $gte: date1}, expectedCheckin: {$lte: date2, $gte: date1}}).then((v)=> {
-          if (v){
-            //there are active bookings in the given range
-            console.log("Booking conflict");
-            resolve("400");
-          } else {
-            resolve("200");
-          }
-        })
-  
-      } else {
-        resolve("404");
-      }
-  
-    })
-   })
-}
-
 
 module.exports = router;
