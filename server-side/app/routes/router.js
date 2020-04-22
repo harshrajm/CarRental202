@@ -13,6 +13,8 @@ var location = require('../config/passport').location;
 
 const jwt = require('jsonwebtoken');
 const keys = 'secret';
+const moment = require('moment-timezone');
+const TIMEZONE = 'America/Los_Angeles';
 
 
 
@@ -265,7 +267,7 @@ vehicles (see below) are assigned to each rental location.
   request type : POST
   query parameters : none
   reqeuest body json : registrationTag, location, type, name, manufacturer, mileage, modelYear
-              lastService, vehicleImageURL, condition, baseRate, hourlyRate ([array])
+              lastService, vehicleImageURL, condition, baseRate, hourlyRate ([array]), lateFees
   return : Returns the vehicle object saved
            status 400 if
            1. location doesn't exist
@@ -296,7 +298,8 @@ vehicles (see below) are assigned to each rental location.
                 vehicleImageURL: req.body.vehicleImageURL,
                 condition: req.body.condition,
                 baseRate: req.body.baseRate,
-                hourlyRate: req.body.hourlyRate
+                hourlyRate: req.body.hourlyRate,
+                lateFees: req.body.lateFees
               });
       
               vehicleDetails.create(v);
@@ -348,7 +351,7 @@ vehicles (see below) are assigned to each rental location.
   request type : PUT
   query parameters : registrationTag 
   request body json : location, type, name, manufacturer, mileage, modelYear
-              lastService, vehicleImageURL, condition, baseRate, hourlyRate ([array])
+              lastService, vehicleImageURL, condition, baseRate, hourlyRate ([array]), lateFees
   return :  200 and returns the updated object
             400 if
             1. registrationTag is missing
@@ -367,7 +370,7 @@ vehicles (see below) are assigned to each rental location.
       if (!obj){
         return res.status(404).send("vehicle not found"); 
       } else {
-        //Chek if location change
+        //Check if location change
         var old_location = obj.location;
         if (req.body.location.localeCompare(obj.location) != 0){
           //check new location capacity
@@ -385,6 +388,7 @@ vehicles (see below) are assigned to each rental location.
                 obj.condition = req.body.condition; 
                 obj.baseRate = req.body.baseRate;
                 obj.hourlyRate = req.body.hourlyRate;
+                obj.lateFees = req.body.lateFees;
                 obj.save();
                 loc.currentVehicles+=1;
                 loc.save();
@@ -417,6 +421,7 @@ vehicles (see below) are assigned to each rental location.
           obj.condition = req.body.condition; 
           obj.baseRate = req.body.baseRate;
           obj.hourlyRate = req.body.hourlyRate;
+          obj.lateFees = req.body.lateFees;
           obj.save();
           return res.send(obj);
         }
@@ -554,8 +559,12 @@ vehicles (see below) are assigned to each rental location.
   */
   //return the bookings of current user
   router.get('/bookings', passport.authenticate('jwt', {session: false}), (req, res) => {
-    bookingDetails.find({email: req.user.email}).then((b) => {
-      return res.send(b);
+    bookingDetails.find({email: req.user.email}).then((bookings) => {
+      var updated_bookings = []
+      for (var booking of bookings){
+        updated_bookings.push(convertBookingDate(booking));
+      }
+      return res.send(updated_bookings);
     })
   });
 
@@ -576,6 +585,8 @@ router.get('/booking', passport.authenticate('jwt', {session: false}), (req, res
       if (!b){
         return res.status(404).send('No such booking found');
       } else {
+        //convert date objects to local time
+        b = convertBookingDate(b);
         return res.send(b);
       }
     })
@@ -759,14 +770,13 @@ router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, 
   endpoint : /return
   request type : POST
   query parameters : bookingId
-  request body json : none
+  request body json : feedback, condition
   return : 200 booking object
            400 bookingId parameter missing
            500 vehicle does not exist
            405 booking has not started
            405 booking is not active
            404 booking not found
-  NOTE : TODO Need to check the cost calculation logic
   */
 router.post('/return', passport.authenticate('jwt', {session: false}), (req, res) => {
   //need id
@@ -781,23 +791,31 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
           //is this return valid?
           const today = new Date();
           const checkOut = new Date(b.checkOut);
-          const diffTime = checkOut - today;
-          if (diffTime < 0){
-              const diffHours = Math.ceil(diffTime / (1000 * 60 * 60 )); 
+          const expectedCheckin = new Date(b.expectedCheckin);
+          const expectedDiffTime = expectedCheckin.getTime() - checkOut.getTime();
+          const actualDiffTime = today.getTime() - checkOut.getTime();
+          if (actualDiffTime > 0){
+              const actualDiffHours = Math.ceil(actualDiffTime / (1000 * 60 * 60 )); 
+              const expectedDiffHours = Math.ceil(expectedDiffTime / (1000 * 60 * 60 ));
               b.isActive = false;
               //charge fees based on rate
               vehicleDetails.findOne({ registrationTag: b.registrationTag}).then((v)=>{
                 if (v){
-                  //TODO fix formula
-                  //TODO apply late fees
-                  b.cost = b.cost + (diffHours * v.hourlyRate);
+                  b.cost = b.cost + (expectedDiffHours * v.hourlyRate[Math.floor(expectedDiffHours/5)%14]);
+                  //late fees
+                  if (actualDiffHours > expectedDiffHours){
+                    b.lateFees = ((actualDiffHours) - (expectedDiffHours)) * v.lateFees;
+                  }
+                  b.paid = true;
+                  b.feedback = req.body.feedback;
+                  v.condition = req.body.condition;
+                  v.save();
+                  b.save();
                 } else {
                   return res.status(500).send("This vehicle does not exist in inventory");
                 }
-              })
-              b.paid = true;
-              b.save();
               return res.send(b);
+              })
             } else {
               return res.status(405).send("Booking must start before return");
             } 
@@ -847,10 +865,11 @@ router.get('/vehicles', async (req,res) => {
       query.condition = req.query.condition;
   }
   if (req.query.checkOut){
-    booking_query.checkOut= {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}
+
+    booking_query.$or = [{checkOut: {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}}]
   }
   if (req.query.expectedCheckin){
-    booking_query.expectedCheckin = {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}
+    booking_query.$or.push({expectedCheckin: {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}})
     numberOfHours = (new Date(req.query.expectedCheckin)).getTime() - (new Date(req.query.checkOut)).getTime();
     numberOfHours = Math.ceil(numberOfHours / (1000 * 60 * 60 )); 
   }
@@ -941,6 +960,24 @@ function isCarAvailable(vid, date_a, date_b){
   
     })
    })
+}
+
+function convertBookingDate(b){
+  b.checkOut = moment(b.checkOut).tz(TIMEZONE);
+  b.expectedCheckin = moment(b.expectedCheckin).tz(TIMEZONE);
+  b.actualCheckin = moment(b.actualCheckin).tz(TIMEZONE);
+  return b;
+}
+
+function convertUserDate(u){
+  u.creditCardExpiry = moment(u.creditCardExpiry).tz(TIMEZONE);
+  u.membershipEndDate = moment(u.membershipEndDate).tz(TIMEZONE);
+  return u;
+}
+
+function convertVehicle(v){
+  v.lastService = moment(v.lastService).tz(TIMEZONE);
+  return v;
 }
 
 module.exports = router;

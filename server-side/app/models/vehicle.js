@@ -13,6 +13,7 @@ const vehicleSchema = new Schema({
     condition: String,
     baseRate: Number,
     hourlyRate: { type: Array, "default": []},
+    lateFees: Number,
     vehicleImageURL: String, 
     bookings:  { type: Array, "default": [] }
 });

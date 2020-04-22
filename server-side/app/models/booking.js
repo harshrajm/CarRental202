@@ -13,6 +13,7 @@ const Booking = new Schema({
     vehicleObject: JSON,
     feedback: String,
     complaints: String,
+    lateFees: 0,
     paid: { type: Boolean, default: false }
 })
 
