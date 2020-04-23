@@ -130,7 +130,11 @@ router.post('/register', (req, res) => {
   
   router.get('/user',
    passport.authenticate('jwt', {session: false}),
-    (req, res) => res.send({user: req.user})
+    (req, res) =>{
+      console.log(req.user);
+      u = convertUserDate(req.user);
+      res.send(req.user);
+    }
   );
   
   router.all("/logout", function(req, res) {
@@ -257,7 +261,7 @@ vehicles (see below) are assigned to each rental location.
       if (!obj){
         return res.status(404).send("vehicle not found"); 
       } else {
-         return res.send(obj);
+         return res.send(convertVehicle(obj));
       }
     })
   });
@@ -306,7 +310,7 @@ vehicles (see below) are assigned to each rental location.
               //update the number then save
               loc.currentVehicles+=1;
               loc.save();
-              return res.send(v);
+              return res.send(convertVehicle(v));
             } else {
               return res.status(400).send("vehicle with same id exists"); 
             }
@@ -397,7 +401,7 @@ vehicles (see below) are assigned to each rental location.
                   if (old_loc){
                     old_loc.currentVehicles-=1;
                     old_loc.save();
-                    return res.send(obj);
+                    return res.send(convertVehicle(obj));
                   } else {
                     return res.status(500).send("Server error -> Cant find old location");
                   }
@@ -423,7 +427,7 @@ vehicles (see below) are assigned to each rental location.
           obj.hourlyRate = req.body.hourlyRate;
           obj.lateFees = req.body.lateFees;
           obj.save();
-          return res.send(obj);
+          return res.send(convertVehicle(obj));
         }
       }
     })
@@ -463,8 +467,12 @@ vehicles (see below) are assigned to each rental location.
       return res.status(400).send('Missing name field');
     } else {
       vehicleDetails.find({ location: req.query.name} ).then((obj)=>{
+        updated_vehicles = []
         if (Array.isArray(obj) && obj.length){
-          return res.send(obj);
+          for(var v of obj){
+            updated_vehicles.push(convertVehicle(v));
+          }
+          return res.send(updated_vehicles);
         } else {
           return res.status(404).send("No cars");
         }
@@ -887,12 +895,16 @@ router.get('/vehicles', async (req,res) => {
     var b = await bookingDetails.find(booking_query)
     if (Array.isArray(b)&& (b.length == 0)){
       //console.log("Car is free ",booking_query, b);
+      //if search issue delete following
+      convertVehicle(v);
       var finalRate = {finalRate: v.baseRate + numberOfHours * v.hourlyRate[Math.floor(numberOfHours/5)%14]};
       var isAvailable = {isAvailable: true};
       //super sketchy
       v._doc = {...v._doc, ...finalRate, ...isAvailable}
       return v;
     } else {
+      //if search issue delete following
+      convertVehicle(v);
       //console.log("This car is not free");
       var isAvailable = {isAvailable: false};
       v._doc = {...v._doc, ...isAvailable};
@@ -967,19 +979,26 @@ function isCarAvailable(vid, date_a, date_b){
 function convertBookingDate(b){
   var checkOut_tz = { checkOut: moment(b.checkOut).format()};
   var expectedCheckin_tz = { expectedCheckin: moment(b.expectedCheckin).format()};
-  var actualCheckin_tz = { actualCheckin: moment(b.actualCheckin).format() };
+  if (b.actualCheckin){
+    var actualCheckin_tz = { actualCheckin: moment(b.actualCheckin).format() };
+  } else {
+    var actualCheckin_tz = { actualCheckin: null };
+  }
+  
   b._doc = {...b._doc, ...checkOut_tz, ...expectedCheckin_tz, ...actualCheckin_tz};
   return b;
 }
 
 function convertUserDate(u){
-  u.creditCardExpiry = moment(u.creditCardExpiry).format();
-  u.membershipEndDate = moment(u.membershipEndDate).format();
+  creditCardExpiry = { creditCardExpiry: moment(u.creditCardExpiry).format()};
+  membershipEndDate = { membershipEndDate: moment(u.membershipEndDate).format()};
+  u._doc = {...u._doc, ...creditCardExpiry, ...membershipEndDate};
   return u;
 }
 
 function convertVehicle(v){
-  v.lastService = moment(v.lastService).tz(TIMEZONE);
+  lastService = { lastService: moment(v.lastService).format()};
+  v._doc = {...v._doc, ...lastService}
   return v;
 }
 
