@@ -779,7 +779,7 @@ router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, 
   endpoint : /return
   request type : POST
   query parameters : bookingId
-  request body json : feedback, condition
+  request body json : feedback, condition, rating
   return : 200 booking object
            400 bookingId parameter missing
            500 vehicle does not exist
@@ -816,6 +816,7 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
                     b.lateFees = ((actualDiffHours) - (expectedDiffHours)) * v.lateFees;
                   }
                   b.paid = true;
+                  b.rating = req.body.rating;
                   b.feedback = req.body.feedback;
                   v.condition = req.body.condition;
                   v.save();

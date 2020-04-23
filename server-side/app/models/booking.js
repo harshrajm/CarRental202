@@ -14,6 +14,7 @@ const Booking = new Schema({
     feedback: String,
     complaints: String,
     lateFees: 0,
+    rating: {type: Number, default: null},
     paid: { type: Boolean, default: false }
 })
 
