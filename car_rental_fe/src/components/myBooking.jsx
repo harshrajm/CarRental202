@@ -59,9 +59,16 @@ class MyBooking extends Component {
   };
   render() {
     Modal.setAppElement("#root");
+    if (!this.state.bookings)
+      return <p className="text-center mt-3"> No bookings to display</p>;
     return (
       <React.Fragment>
-        <h1>My Bookings!</h1>
+        {this.state.bookings && (
+          <p className="ml-4 mt-3">
+            {" "}
+            displaying {this.state.bookings.length} booking(s)
+          </p>
+        )}
         {this.state.bookings &&
           this.state.bookings.map(b => (
             <BookingCard
@@ -86,7 +93,7 @@ class MyBooking extends Component {
           <br />
           {this.state.selected && (
             <div className="row justify-content-center">
-              <div className="col-3">
+              <div className="col-3 addTopMargin">
                 <div className="card">
                   <div className=" thumbnail text-center">
                     <img
