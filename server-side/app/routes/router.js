@@ -896,7 +896,8 @@ router.get('/vehicles', async (req,res) => {
       //console.log("This car is not free");
       var isAvailable = {isAvailable: false};
       v._doc = {...v._doc, ...isAvailable};
-      return;
+      //returning so UI can take care of it
+      return v;
     }
   }
 
