@@ -965,15 +965,16 @@ function isCarAvailable(vid, date_a, date_b){
 }
 
 function convertBookingDate(b){
-  b.checkOut = moment(b.checkOut).tz(TIMEZONE);
-  b.expectedCheckin = moment(b.expectedCheckin).tz(TIMEZONE);
-  b.actualCheckin = moment(b.actualCheckin).tz(TIMEZONE);
+  var checkOut_tz = { checkOut: moment(b.checkOut).format()};
+  var expectedCheckin_tz = { expectedCheckin: moment(b.expectedCheckin).format()};
+  var actualCheckin_tz = { actualCheckin: moment(b.actualCheckin).format() };
+  b._doc = {...b._doc, ...checkOut_tz, ...expectedCheckin_tz, ...actualCheckin_tz};
   return b;
 }
 
 function convertUserDate(u){
-  u.creditCardExpiry = moment(u.creditCardExpiry).tz(TIMEZONE);
-  u.membershipEndDate = moment(u.membershipEndDate).tz(TIMEZONE);
+  u.creditCardExpiry = moment(u.creditCardExpiry).format();
+  u.membershipEndDate = moment(u.membershipEndDate).format();
   return u;
 }
 
