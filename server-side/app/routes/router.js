@@ -753,10 +753,18 @@ router.delete('/booking', passport.authenticate('jwt', {session: false}), (req, 
             if (diffHours > 1){
               //donot delete, just change isActive to false for now
               b.isActive = false;
+              //set cost to zero
+              b.cost = 0
               b.save();
               return res.send("Booking cancelled");
             } else {
-              return res.status(405).send("Booking must be cancelled atleast one hour before");
+              //find rate for 1 hour
+              vehicleDetails.findOne({ registrationTag: b.registrationTag }).then((v)=> {
+                b.cost = b.cost + v.hourlyRate[0];
+                b.isActive = false;
+                b.save();
+                return res.send("Charged for 1 hour");
+              })
             } 
           } else {
             //console.log("Time difference");
@@ -813,6 +821,7 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
                   b.cost = b.cost + (expectedDiffHours * v.hourlyRate[Math.floor(expectedDiffHours/5)%14]);
                   //late fees
                   if (actualDiffHours > expectedDiffHours){
+                    //TODO NaN
                     b.lateFees = ((actualDiffHours) - (expectedDiffHours)) * v.lateFees;
                   }
                   b.paid = true;
