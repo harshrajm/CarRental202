@@ -36,13 +36,18 @@ class CarCard extends Component {
                 {/* <small className="float-right font-weight-light">Starting from</small>
                 <br /> */}
 
-                <h4 className="card-title float-right">
-                  <FaDollarSign />
-                  {rate}
-                </h4>
-                <small className="float-right mt-2 font-weight-light">
-                  Rate :
-                </small>
+                {rate && (
+                  <React.Fragment>
+                    <h4 className="card-title float-right">
+                      <FaDollarSign />
+                      {rate}
+                    </h4>
+
+                    <small className="float-right mt-2 font-weight-light">
+                      Rate :
+                    </small>
+                  </React.Fragment>
+                )}
 
                 <h3 className="card-title">{manu + " " + name}</h3>
 
