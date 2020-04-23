@@ -24,7 +24,7 @@ class MyBooking extends Component {
   handleEndTripClick = id => {
     //alert("id " + id);
     const selectedBooking = this.state.bookings.filter(b => {
-      return b._id == id;
+      return b._id === id;
     });
     const data = { ...this.state.data };
     data["bookingId"] = id;
@@ -79,7 +79,6 @@ class MyBooking extends Component {
           ))}
 
         <Modal
-          //ariaHideApp={false}
           isOpen={this.state.showModal}
           contentLabel="Minimal Modal Example"
         >
