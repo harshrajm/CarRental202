@@ -42,7 +42,21 @@ class MyBooking extends Component {
     data["rating"] = value;
     this.setState({ data });
   };
-
+  handleSubmit = async e => {
+    e.preventDefault();
+    alert("form submitted");
+    //console.log("form submitted!!", this.state.data);
+    //call backend
+    try {
+      const { data } = this.state;
+      //backend call
+      //update state with new list
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        console.log("400 error");
+      }
+    }
+  };
   render() {
     Modal.setAppElement("#root");
     return (
@@ -120,7 +134,7 @@ class MyBooking extends Component {
                 </div>
               </div>
               <div className="col-7">
-                <form>
+                <form onSubmit={this.handleSubmit}>
                   <h3>Overall Rating</h3>
                   <Rating
                     onChange={this.handleChangeRating}
