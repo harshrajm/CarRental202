@@ -14,8 +14,9 @@ class MyBooking extends Component {
     return (
       <React.Fragment>
         <h1>My Bookings!</h1>
-
-        <BookingCard />
+        {this.state.bookings &&
+          this.state.bookings.map(b => <BookingCard bookingsDtls={b} />)}
+        {/* <BookingCard /> */}
       </React.Fragment>
     );
   }

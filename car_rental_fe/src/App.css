@@ -49,3 +49,23 @@
 img {
   object-fit: cover;
 }
+
+.thumbnail {
+  position: relative;
+}
+
+.caption {
+  position: absolute;
+  bottom: 0%;
+  left: 0;
+  width: 100%;
+  color: #f2f2f2;
+  text-shadow: 2px 2px 2px #282c34;
+}
+
+.imgBadge {
+  position: absolute;
+  top: 5%;
+  right: 35%;
+  width: 100%;
+}
