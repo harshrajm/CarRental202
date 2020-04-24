@@ -9,6 +9,7 @@ import Logout from "./components/logout";
 import MyBooking from "./components/myBooking";
 import auth from "./services/authService";
 import "./App.css";
+import MyProfile from "./components/myProfile";
 
 class App extends Component {
   state = {};
@@ -36,6 +37,10 @@ class App extends Component {
             <Route
               path="/myBookings"
               render={props => <MyBooking {...props} user={user} />}
+            />
+            <Route
+              path="/profile"
+              render={props => <MyProfile {...props} user={user} />}
             />
 
             <Route path="/not-found" component={NotFound} />

@@ -16,3 +16,15 @@ export function postNewBooking(queryString) {
 export function getBookings() {
   return http.get(apiUrl + "/bookings");
 }
+
+export function postReturnVehicle(queryString, body) {
+  return http.post(apiUrl + "/return?" + queryString, body);
+}
+
+export function cancelBooking(bookingId) {
+  return http.delete(apiUrl + "/booking?bookingId=" + bookingId);
+}
+
+export function getUser() {
+  return http.get(apiUrl + "/user");
+}

@@ -15,7 +15,8 @@ class BookingCard extends Component {
       isActive,
       paid,
       registrationTag,
-      vehicleObject
+      vehicleObject,
+      lateFees
     } = this.props.bookingsDtls;
 
     return (
@@ -42,13 +43,30 @@ class BookingCard extends Component {
           </div>
           <div className="col-md-8 ">
             <div className="card-block p-3">
-              <h4 className="card-title float-right">
-                <FaDollarSign />
-                {cost}
-              </h4>
-              <small className="float-right mt-2 font-weight-light">
-                Rate :
-              </small>
+              {!isActive && (
+                <h4 className="card-title float-right">
+                  <FaDollarSign />
+                  {lateFees && lateFees > 0
+                    ? `${cost} + ${lateFees} (late fee)`
+                    : `${cost}`}
+                </h4>
+              )}
+              {isActive && (
+                <h4 className="card-title float-right">
+                  <FaDollarSign />
+                  {cost}
+                </h4>
+              )}
+              {isActive && (
+                <small className="float-right mt-2 font-weight-light">
+                  Base Rate :
+                </small>
+              )}
+              {!isActive && (
+                <small className="float-right mt-2 font-weight-light">
+                  Final Rate :
+                </small>
+              )}
               <h3 className="card-title">
                 {vehicleObject.manufacturer + " " + vehicleObject.name}
               </h3>
@@ -68,15 +86,22 @@ class BookingCard extends Component {
               <br />
               <br />
 
-              {moment(new Date()) < moment(checkOut) && (
+              {isActive && moment(new Date()) < moment(checkOut) && (
                 <span className="badge badge-primary"> upcoming</span>
               )}
               {!isActive && <span class="badge badge-danger">finished</span>}
-              {moment(new Date()) > moment(checkOut) && isActive && (
-                <span className="badge badge-success">ongoing</span>
-              )}
-              {moment(new Date()) < moment(checkOut) && (
-                <button type="button" className="btn btn-warning float-right">
+
+              {isActive &&
+                moment(new Date()) > moment(checkOut) &&
+                isActive && (
+                  <span className="badge badge-success">ongoing</span>
+                )}
+              {isActive && moment(new Date()) < moment(checkOut) && (
+                <button
+                  type="button"
+                  className="btn btn-warning float-right"
+                  onClick={() => this.props.onCancelBookingClicked(_id)}
+                >
                   {moment(new Date()).add(1, "hours") < moment(checkOut)
                     ? "Cancel booking for free"
                     : "Cancel booking with penalty"}

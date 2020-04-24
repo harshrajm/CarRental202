@@ -44,7 +44,7 @@ class CarCard extends Component {
                     </h4>
 
                     <small className="float-right mt-2 font-weight-light">
-                      Rate :
+                      Estimate :
                     </small>
                   </React.Fragment>
                 )}
