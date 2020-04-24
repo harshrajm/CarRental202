@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 
-class AdminHome extends Component {
+class ManageVehicle extends Component {
   state = {};
   render() {
     return (
       <React.Fragment>
-        <h2>Admin Home</h2>
+        <h2>Manage Vehicle</h2>
         <hr />
       </React.Fragment>
     );
   }
 }
 
-export default AdminHome;
+export default ManageVehicle;

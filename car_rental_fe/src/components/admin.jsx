@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { Link, NavLink } from "react-router-dom";
 import AdminHome from "./adminHome";
-import AddLocation from "./addLocation";
+import ManageLocation from "./manageLocation";
 import { Route, Redirect, Switch } from "react-router-dom";
-import AddVehicle from "./addVehicle";
-import RemoveUsers from "./removeUsers";
+import ManageVehicle from "./manageVehicle";
+import ManageUsers from "./manageUsers";
 class AdminDashboard extends Component {
   state = {};
 
@@ -12,7 +12,7 @@ class AdminDashboard extends Component {
     return (
       <React.Fragment>
         <div className="row mt-5">
-          <div className="col-2">
+          <div className="col-3">
             <ul
               className="nav flex-column nav-pills"
               aria-orientation="vertical"
@@ -23,23 +23,23 @@ class AdminDashboard extends Component {
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink className="nav-link" to="/admin/addLocation">
-                  Add Location
+                <NavLink className="nav-link" to="/admin/location">
+                  Manage Locations
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink className="nav-link" to="/admin/addVehicle">
-                  Add Vehicle
+                <NavLink className="nav-link" to="/admin/vehicle">
+                  Manage Vehicles
                 </NavLink>
               </li>
               <li className="nav-item">
-                <NavLink className="nav-link " to="/admin/removeUsers">
-                  Remove Users
+                <NavLink className="nav-link " to="/admin/manageUsers">
+                  Manage Users
                 </NavLink>
               </li>
             </ul>
           </div>
-          <div className="col-10">
+          <div className="col-9">
             <Switch>
               <Route
                 path="/admin/home"
@@ -48,21 +48,21 @@ class AdminDashboard extends Component {
                 )}
               />
               <Route
-                path="/admin/addLocation"
+                path="/admin/location"
                 render={props => (
-                  <AddLocation {...props} user={this.props.user} />
+                  <ManageLocation {...props} user={this.props.user} />
                 )}
               />
               <Route
-                path="/admin/addVehicle"
+                path="/admin/vehicle"
                 render={props => (
-                  <AddVehicle {...props} user={this.props.user} />
+                  <ManageVehicle {...props} user={this.props.user} />
                 )}
               />
               <Route
-                path="/admin/removeUsers"
+                path="/admin/manageUsers"
                 render={props => (
-                  <RemoveUsers {...props} user={this.props.user} />
+                  <ManageUsers {...props} user={this.props.user} />
                 )}
               />
               <Redirect from="/admin" exact to="/admin/home" />
