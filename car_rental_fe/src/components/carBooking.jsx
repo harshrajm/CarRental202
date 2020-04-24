@@ -42,7 +42,12 @@ class CarBooking extends Component {
 
   render() {
     if (!this.state.vehicles) {
-      return <CarSearchForm onVehiclesUpdate={this.handleVehiclesUpdate} />;
+      return (
+        <CarSearchForm
+          onVehiclesUpdate={this.handleVehiclesUpdate}
+          user={this.props.user}
+        />
+      );
     }
 
     return (
