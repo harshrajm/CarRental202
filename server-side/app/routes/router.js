@@ -804,9 +804,9 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
     //check if the booking is active also
     bookingDetails.findOne({email: req.user.email, _id: req.query.bookingId }).then((b) => {
       if (b){
-        console.log("Inside query ",b);
+        //console.log("Inside query ",b);
         if (b.isActive){
-          console.log("Here in active ", b);
+          //console.log("Here in active ", b);
           //is this return valid?
           const today = new Date();
           const checkOut = new Date(b.checkOut);
@@ -836,7 +836,7 @@ router.post('/return', passport.authenticate('jwt', {session: false}), (req, res
                 } else {
                   return res.status(500).send("This vehicle does not exist in inventory");
                 }
-              console.log(b);
+              //console.log(b);
               return res.send(b);
               })
             } else {

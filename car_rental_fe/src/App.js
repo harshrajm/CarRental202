@@ -10,6 +10,7 @@ import MyBooking from "./components/myBooking";
 import auth from "./services/authService";
 import "./App.css";
 import MyProfile from "./components/myProfile";
+import AdminDashboard from "./components/admin";
 
 class App extends Component {
   state = {};
@@ -41,6 +42,10 @@ class App extends Component {
             <Route
               path="/profile"
               render={props => <MyProfile {...props} user={user} />}
+            />
+            <Route
+              path="/admin"
+              render={props => <AdminDashboard {...props} user={user} />}
             />
 
             <Route path="/not-found" component={NotFound} />

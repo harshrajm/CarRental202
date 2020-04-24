@@ -39,15 +39,14 @@ class MyProfile extends Component {
               <div className="col-8">
                 {membershipActive ? (
                   <span className="badge badge-success float-right">
-                    Membership Active
+                    MEMBERSHIP ACTIVE
                   </span>
                 ) : (
                   <span className="badge badge-danger float-right">
-                    Membership Ended
+                    MEMBERSHIP ENDED
                   </span>
                 )}
                 <h2 className="card-title">{name}</h2>
-
                 <p className="card-text">{email}</p>
                 <p className="card-text">
                   Member till :{" "}

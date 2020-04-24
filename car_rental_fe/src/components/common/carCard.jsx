@@ -60,14 +60,12 @@ class CarCard extends Component {
                 <br />
                 <br />
                 {isAvailable && (
-                  <span className="badge badge-pill badge-success">
-                    Available
-                  </span>
+                  <h3 className="badge badge-pill badge-success">AVAILABLE</h3>
                 )}
                 {!isAvailable && (
-                  <span className="badge badge-pill badge-danger">
-                    Not Available
-                  </span>
+                  <h3 className="badge badge-pill badge-danger">
+                    NOT AVAILABLE
+                  </h3>
                 )}
 
                 {isAvailable && (

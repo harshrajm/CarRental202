@@ -87,15 +87,13 @@ class BookingCard extends Component {
               <br />
 
               {isActive && moment(new Date()) < moment(checkOut) && (
-                <span className="badge badge-primary"> upcoming</span>
+                <h3 className="badge badge-primary"> UPCOMING</h3>
               )}
-              {!isActive && <span class="badge badge-danger">finished</span>}
+              {!isActive && <h3 class="badge badge-danger">FINISHED</h3>}
 
               {isActive &&
                 moment(new Date()) > moment(checkOut) &&
-                isActive && (
-                  <span className="badge badge-success">ongoing</span>
-                )}
+                isActive && <h3 className="badge badge-success">ONGOING</h3>}
               {isActive && moment(new Date()) < moment(checkOut) && (
                 <button
                   type="button"
