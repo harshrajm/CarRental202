@@ -15,6 +15,28 @@ ENDPOINTS
 4. /user - GET - returns the currently logged in users object
 5. /logout - GET - clears the current session and redirects to login.
 
+User membership
+---------------
+```
+  endpoint : /user/membership
+  request type : POST
+  query parameters : none
+  body :   none
+  return : 200 membership extended
+           500 user update failed
+           404 user not found
+```
+
+```
+  endpoint : /user
+  request type : DELETE
+  query parameters : none
+  body : email
+  return : 200 user deleted
+           status 500 user delete failed
+           status 404 user not found
+```
+
 Vehicle endpoints
 -------------------
 ```

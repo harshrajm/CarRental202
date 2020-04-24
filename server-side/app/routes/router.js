@@ -143,9 +143,15 @@ router.post('/register', (req, res) => {
   });
   
   
-  //delete user endpoint
-  //this endpoint is for customer only
-  //to terminate his account
+  /*
+  endpoint : /user
+  request type : DELETE
+  query parameters : none
+  body : email
+  return : 200 user deleted
+           status 500 user delete failed
+           status 404 user not found 
+  */
   router.delete('/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Customer),
   (req, res) => {
         //delete the user
@@ -169,6 +175,15 @@ router.post('/register', (req, res) => {
         })
   });
 
+  /*
+  endpoint : /user/membership
+  request type : POST
+  query parameters : none
+  body :   none
+  return : 200 membership extended
+           500 user update failed
+           404 user not found
+  */
   router.post('/user/membership', passport.authenticate('jwt', {session: false}),
   (req, res) => {
     UserDetails.findOne({email: req.user.email}).then((user) => {
@@ -180,7 +195,7 @@ router.post('/register', (req, res) => {
           d = Date();
           d.setMonth(d.getMonth() + 6);
         }
-        UserDetails.updateOne({email: req.body.email}, {membershipEndDate: d, membershipActive: true }).then((obj)=> {
+        UserDetails.updateOne({email: req.user.email}, {membershipEndDate: d, membershipActive: true }).then((obj)=> {
           if (obj.ok != 1){
             console.log("Object update error");
             console.log(err);
@@ -201,13 +216,7 @@ router.post('/register', (req, res) => {
 /* ADMIN ENDPOINTS 
    ---------------
 
-TODO
------
-   The administrator should be able to enter rental locations into the
-system. Each rental location should have a name, address, and a vehicle
-capacity (the maximum number of vehicles it can hold). A number of
-vehicles (see below) are assigned to each rental location.
-
+   
 1. /admin/user - DELETE - delete other users - admin only
 2. /vehicle - POST - add a vehicle to db - admin only
 3. /vehicle/{registrationTag} - GET - get a vehicle from db - customer/admin
@@ -220,6 +229,16 @@ vehicles (see below) are assigned to each rental location.
 
   //delete user endpoint
   //this endpoint is for admin only
+  /*
+  endpoint : /admin/user
+  request type : DELETE
+  query parameters : none
+  body : email
+  return : 200 user deleted
+           500 user delete failed
+           404 user not found
+            
+  */
   router.delete('/admin/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => {
     console.log('Deleting user', req.body.email);
