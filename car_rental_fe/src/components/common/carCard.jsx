@@ -44,7 +44,7 @@ class CarCard extends Component {
                     </h4>
 
                     <small className="float-right mt-2 font-weight-light">
-                      Rate :
+                      Estimate :
                     </small>
                   </React.Fragment>
                 )}
@@ -60,14 +60,12 @@ class CarCard extends Component {
                 <br />
                 <br />
                 {isAvailable && (
-                  <span className="badge badge-pill badge-success">
-                    Available
-                  </span>
+                  <h3 className="badge badge-pill badge-success">AVAILABLE</h3>
                 )}
                 {!isAvailable && (
-                  <span className="badge badge-pill badge-danger">
-                    Not Available
-                  </span>
+                  <h3 className="badge badge-pill badge-danger">
+                    NOT AVAILABLE
+                  </h3>
                 )}
 
                 {isAvailable && (

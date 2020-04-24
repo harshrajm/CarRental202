@@ -1,9 +1,14 @@
 import React, { Component } from "react";
-import { getBookings } from "../services/backendCallService";
+import {
+  getBookings,
+  postReturnVehicle,
+  cancelBooking
+} from "../services/backendCallService";
 import BookingCard from "./common/bookingCard";
 import Modal from "react-modal";
 import moment from "moment";
 import Rating from "react-rating";
+import qs from "query-string";
 
 class MyBooking extends Component {
   state = {
@@ -28,9 +33,24 @@ class MyBooking extends Component {
     });
     const data = { ...this.state.data };
     data["bookingId"] = id;
-
     this.setState({ data, selected: selectedBooking[0], showModal: true });
   };
+
+  handleCancelBooking = async id => {
+    alert("cancel " + id);
+    //backend call
+    try {
+      await cancelBooking(id);
+      const { data: bookings } = await getBookings();
+      this.setState({ bookings });
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        console.log("400 error");
+      }
+    }
+    //update list
+  };
+
   handleChange = ({ currentTarget: input }) => {
     const data = { ...this.state.data };
     data[input.name] = input.value;
@@ -44,13 +64,17 @@ class MyBooking extends Component {
   };
   handleSubmit = async e => {
     e.preventDefault();
-    alert("form submitted");
+    //alert("form submitted");
     //console.log("form submitted!!", this.state.data);
     //call backend
+    const data = { ...this.state.data };
+
     try {
-      const { data } = this.state;
       //backend call
+      await postReturnVehicle(qs.stringify(data), data);
       //update state with new list
+      const { data: bookings } = await getBookings();
+      this.setState({ bookings, showModal: false });
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");
@@ -75,6 +99,7 @@ class MyBooking extends Component {
               key={b._id}
               bookingsDtls={b}
               onEndTripClicked={this.handleEndTripClick}
+              onCancelBookingClicked={this.handleCancelBooking}
             />
           ))}
 

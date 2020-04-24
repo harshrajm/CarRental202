@@ -158,7 +158,11 @@ class CarSearchForm extends Component {
                     }
                   </span>
                 )}
-                <button type="submit" className="btn btn-primary float-right">
+                <button
+                  type="submit"
+                  className="btn btn-primary float-right"
+                  disabled={this.props.user && this.props.user.isAdmin}
+                >
                   Search
                 </button>
               </form>
