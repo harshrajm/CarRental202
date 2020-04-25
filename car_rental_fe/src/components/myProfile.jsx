@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { getUser } from "../services/backendCallService";
+import { getUser, extendMembership } from "../services/backendCallService";
 import moment from "moment";
 
 class MyProfile extends Component {
@@ -9,8 +9,11 @@ class MyProfile extends Component {
     this.setState({ user });
   }
 
-  handleExtend = () => {
+  handleExtend = async () => {
     alert("extend membership clicked");
+    await extendMembership();
+    const { data: user } = await getUser();
+    this.setState({ user });
   };
 
   render() {

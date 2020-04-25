@@ -28,3 +28,7 @@ export function cancelBooking(bookingId) {
 export function getUser() {
   return http.get(apiUrl + "/user");
 }
+
+export function extendMembership() {
+  return http.post(apiUrl + "/user/membership");
+}
