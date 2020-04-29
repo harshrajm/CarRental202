@@ -25,12 +25,12 @@ export default class ManageUsers extends Component {
     if (this.state.user) {
       return this.state.user.map(item => (
         <tr>
-          <td>{item.username}</td>
           <td>{item.name}</td>
+          <td>{item.username}</td>
           <td>{item.email}</td>
           <td>{item.membershipActive.toString()}</td>
           <td>
-      <a href="#" onClick={() => { item.deleteUser(item._id) }}>delete</a>
+      <a href="#" onClick={() => { item.deleteUser(item._id) }}>Terminate</a>
     </td>
         </tr>
       ));
@@ -44,8 +44,8 @@ export default class ManageUsers extends Component {
         <table className="table">
           <thead className="thead-light">
             <tr>
-              <th>Username</th>
               <th>Name</th>
+              <th>Username</th>
               <th>Email</th>
               <th>Membership Active</th>
             </tr>
