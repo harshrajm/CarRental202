@@ -202,7 +202,19 @@ Search endpoints
    request body json : none 
    return :  Array of vehicle objects available	
 ```
-  
+
+Suggest cars endpoint
+---------------------
+```
+   endpoint : /suggest/vehicles
+   request type : GET
+   query parameters : location is needed. others are optional 
+                      type, manufacturer, condition, checkOut, expectedCheckin 
+   request body json : none 
+   return :  Array of vehicle objects available at locations other than this location
+   NOTE : we return only the vehicles that match the query and are in other locations
+   We dont return cars that are not available
+```
 
 Setup instructions
 ------------------

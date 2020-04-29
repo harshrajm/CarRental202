@@ -586,7 +586,7 @@ router.post('/register', (req, res) => {
   */
   //return the bookings of current user
   router.get('/bookings', passport.authenticate('jwt', {session: false}), (req, res) => {
-    bookingDetails.find({email: req.user.email}).then((bookings) => {
+    bookingDetails.find({ $query: {email: req.user.email}, $orderby: { isActive: 1 }}).then((bookings) => {
       var updated_bookings = []
       for (var booking of bookings){
         updated_bookings.push(convertBookingDate(booking));
@@ -657,7 +657,7 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
                 email: req.user.email, 
                 checkOut: checkOutDate,
                 vehicleObject: {name: v.name, manufacturer: v.manufacturer, registrationTag: v.registrationTag,
-                  vehicleImageURL: v.vehicleImageURL, type: v.type },
+                  vehicleImageURL: v.vehicleImageURL, type: v.type, location: v.location },
                 cost: 0,
                 expectedCheckin: expectedCheckinDate
               });
@@ -943,6 +943,104 @@ router.get('/vehicles', async (req,res) => {
       v._doc = {...v._doc, ...isAvailable};
       //returning so UI can take care of it
       return v;
+    }
+  }
+
+  async function asyncForEach(obj, booking_query){
+    for(let index=0; index < obj.length; index++){
+      booking_query.registrationTag = booking_query.registrationTag;
+      //available_cars.push()
+      var b = await find_bookings(obj[index], booking_query)
+      if (b){
+        available_cars.push(b);
+      }
+    }
+  }
+
+
+  async function find_cars(query, booking_query){
+    var obj = await vehicleDetails.find(query);
+    //console.log("obj is ",obj);
+  //check if this vehicle is free
+  if (obj){
+      //console.log(obj);
+      await asyncForEach(obj, booking_query);
+      //console.log("Looped ", available_cars);
+      return available_cars;
+    } else {
+      //console.log("Didn't even loop")
+      return available_cars;
+    }
+  }
+
+  var available_cars = await find_cars(query, booking_query);
+  //console.log("Returning ", available_cars);
+  hrend = process.hrtime(hrstart)
+  console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+  return res.send(available_cars);
+    
+})
+
+/*
+  endpoint : /suggest/vehicles
+  request type : GET
+  query parameters : location is needed. others are optional 
+                     type, manufacturer, condition, checkOut, expectedCheckin 
+  request body json : none 
+  return :  Array of vehicle objects available at locations other than this location
+  NOTE : we return only the vehicles that match the query and are in other locations
+  We dont return suggestions
+  */
+
+router.get('/suggest/vehicles', async (req,res) => {
+  console.log("Searching for vehicle in other places");
+  var hrstart = process.hrtime();
+  var query = {};
+  var booking_query = {};
+  var numberOfHours = 0;
+  if (req.query.location){
+      query.location = { $ne: req.query.location };
+  }
+  if (req.query.type){
+      query.type = req.query.type;
+  }
+  if (req.query.manufacturer){
+      query.manufacturer = req.query.manufacturer;
+  }
+  if (req.query.condition){
+      query.condition = req.query.condition;
+  }
+  if (req.query.checkOut){
+
+    booking_query.$or = [{checkOut: {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}}]
+  }
+  if (req.query.expectedCheckin){
+    booking_query.$or.push({expectedCheckin: {$lte: new Date(req.query.expectedCheckin), $gte: new Date(req.query.checkOut)}})
+    numberOfHours = (new Date(req.query.expectedCheckin)).getTime() - (new Date(req.query.checkOut)).getTime();
+    numberOfHours = Math.ceil(numberOfHours / (1000 * 60 * 60 )); 
+  }
+  booking_query.isActive = true;
+
+  //Now query and return the vehicle objects
+  console.log("Query is ", query);
+  console.log("Booking query", booking_query);
+
+  var available_cars = [];
+
+  async function find_bookings(v, booking_query){
+    booking_query.registrationTag = v.registrationTag;
+    var b = await bookingDetails.find(booking_query)
+    if (Array.isArray(b)&& (b.length == 0)){
+      //console.log("Car is free ",booking_query, b);
+      //if search issue delete following
+      convertVehicle(v);
+      var finalRate = {finalRate: v.baseRate + numberOfHours * v.hourlyRate[Math.floor(numberOfHours/5)%14]};
+      var isAvailable = {isAvailable: true};
+      //super sketchy
+      v._doc = {...v._doc, ...finalRate, ...isAvailable}
+      return v;
+    } else {
+      //dont return anything
     }
   }
 
