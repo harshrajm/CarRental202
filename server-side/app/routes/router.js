@@ -188,7 +188,7 @@ router.post('/register', (req, res) => {
   (req, res) => {
     UserDetails.findOne({email: req.user.email}).then((user) => {
       if (user){
-        var d = Date(user.membershipEndDate); 
+        var d = new Date(user.membershipEndDate); 
         if (user.membershipActive){
           d.setMonth(d.getMonth() + 6);
         } else {

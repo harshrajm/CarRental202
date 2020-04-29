@@ -10,7 +10,7 @@ class MyProfile extends Component {
   }
 
   handleExtend = async () => {
-    alert("extend membership clicked");
+    //alert("extend membership clicked");
     await extendMembership();
     const { data: user } = await getUser();
     this.setState({ user });
