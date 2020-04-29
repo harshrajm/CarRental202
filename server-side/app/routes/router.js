@@ -188,7 +188,7 @@ router.post('/register', (req, res) => {
   (req, res) => {
     UserDetails.findOne({email: req.user.email}).then((user) => {
       if (user){
-        var d = Date(user.membershipEndDate); 
+        var d = new Date(user.membershipEndDate); 
         if (user.membershipActive){
           d.setMonth(d.getMonth() + 6);
         } else {
@@ -586,7 +586,7 @@ router.post('/register', (req, res) => {
   */
   //return the bookings of current user
   router.get('/bookings', passport.authenticate('jwt', {session: false}), (req, res) => {
-    bookingDetails.find({email: req.user.email}).then((bookings) => {
+    bookingDetails.find({ $query: {email: req.user.email}, $orderby: { isActive: 1 }}).then((bookings) => {
       var updated_bookings = []
       for (var booking of bookings){
         updated_bookings.push(convertBookingDate(booking));
@@ -657,7 +657,7 @@ router.post('/booking', passport.authenticate('jwt', {session: false}), (req, re
                 email: req.user.email, 
                 checkOut: checkOutDate,
                 vehicleObject: {name: v.name, manufacturer: v.manufacturer, registrationTag: v.registrationTag,
-                  vehicleImageURL: v.vehicleImageURL, type: v.type },
+                  vehicleImageURL: v.vehicleImageURL, type: v.type, location: v.location },
                 cost: 0,
                 expectedCheckin: expectedCheckinDate
               });
