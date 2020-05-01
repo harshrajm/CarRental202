@@ -4,6 +4,7 @@ import moment from "moment";
 import qs from "query-string";
 import { getLocation, getVehicles } from "../services/backendCallService";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 class CarSearchForm extends Component {
   state = {
@@ -193,6 +194,12 @@ class CarSearchForm extends Component {
                 >
                   Search
                 </button>
+                <Link
+                  className="btn btn-secondary float-right mr-1"
+                  to="/ViewAllVehicles"
+                >
+                  View all vehicles
+                </Link>
               </form>
             </div>
           </div>

@@ -16,7 +16,8 @@ class CarCard extends Component {
       baseRate,
       hourlyRate,
       onBookClick,
-      registrationTag
+      registrationTag,
+      allowSelectAction
     } = this.props;
     return (
       <React.Fragment>
@@ -36,7 +37,7 @@ class CarCard extends Component {
                 {/* <small className="float-right font-weight-light">Starting from</small>
                 <br /> */}
 
-                {rate && (
+                {allowSelectAction && rate && (
                   <React.Fragment>
                     <h4 className="card-title float-right">
                       <FaDollarSign />
@@ -59,16 +60,16 @@ class CarCard extends Component {
                 </p>
                 <br />
                 <br />
-                {isAvailable && (
+                {allowSelectAction && isAvailable && (
                   <h3 className="badge badge-pill badge-success">AVAILABLE</h3>
                 )}
-                {!isAvailable && (
+                {allowSelectAction && !isAvailable && (
                   <h3 className="badge badge-pill badge-danger">
                     NOT AVAILABLE
                   </h3>
                 )}
 
-                {isAvailable && (
+                {allowSelectAction && isAvailable && (
                   <button
                     type="button"
                     className="btn btn-primary  float-right"
@@ -78,7 +79,7 @@ class CarCard extends Component {
                   </button>
                 )}
 
-                {!isAvailable && (
+                {allowSelectAction && !isAvailable && (
                   <button type="button" className="btn btn-link  float-right">
                     Find {type} at other locations
                   </button>

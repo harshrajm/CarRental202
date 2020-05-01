@@ -13,6 +13,7 @@ import MyProfile from "./components/myProfile";
 import AdminDashboard from "./components/admin";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import ViewAllVehicles from "./components/viewAllVehicles";
 
 class App extends Component {
   state = {};
@@ -38,6 +39,10 @@ class App extends Component {
             <Route
               path="/book"
               render={props => <CarBooking {...props} user={user} />}
+            />
+            <Route
+              path="/viewAllVehicles"
+              render={props => <ViewAllVehicles {...props} user={user} />}
             />
             <Route
               path="/myBookings"

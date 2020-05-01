@@ -14,8 +14,11 @@ class NavBar extends Component {
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div className="navbar-nav">
             <NavLink className="nav-item nav-link" to="/book">
-              Book a car
+              Book a vehicle
             </NavLink>
+            {/* <NavLink className="nav-item nav-link" to="/viewAllVehicles">
+              View all vehicles
+            </NavLink> */}
             {user && !user.isAdmin && (
               <NavLink className="nav-item nav-link" to="/myBookings">
                 My Bookings

@@ -100,6 +100,7 @@ class CarBooking extends Component {
             hourlyRate={v.hourlyRate}
             onBookClick={this.handleBookClick}
             registrationTag={v.registrationTag}
+            allowSelectAction={true}
           />
         ))}
         {/* <CarCard /> */}
