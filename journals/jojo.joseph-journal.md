@@ -3,6 +3,24 @@ What tasks did I work on / complete?
 What am I planning to work on next?
 What tasks are blocked waiting on another team member?
 
+
+4/28/2020
+---------
+Added final rate calculations based on dates / number of hours used. This rate is shown to the user as an estimate.
+The final rate is applied when the car is returned using the return endpoint and the late fees is added, if any.
+
+Issues with timezone is fixed by using moment js. It converts the ISO date tme stored in mongo to local timezone equivalent.
+Embedded details about location and car used inside booking object to avoid multiple queries / rest calls from MyBookings page.
+
+Need to add ratings for booking experience. Also need to implement suggest cars endpoint.
+
+4/21/2020
+---------
+Fixed issues with backend code. Enabled CORS. Fixed issues with date data.
+Added search cars endpoint. Prevented duplicate entries for locations.
+
+Need to implement suggest cars endpoint. Need to add rate calculation endpoint.
+
 4/14/2020
 ---------
 Implemented endpoints for vehicles crud operations. User crud operation.

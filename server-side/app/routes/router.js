@@ -20,9 +20,13 @@ const TIMEZONE = 'America/Los_Angeles';
 
 router.post('/register', (req, res) => {
     //TODO check if all params are received
-    UserDetails.findOne({email: req.body.email}).then((user) => {
+    UserDetails.findOne({ $or : [{username: req.body.username}, {email: req.body.email}]}).then((user) => {
       if (user) {
-        res.status(400).send("Error - email already used", user, req.body.email);
+        if (user.email.localeCompare(req.body.email) == 0){
+          res.status(400).send("Error - email already used ");
+        } else {
+          res.status(400).send("Error - username already used ");
+        }        
       } else {
         //console.log(req.body);
         var d = new Date();
