@@ -3,6 +3,7 @@ import DateTimePicker from "react-datetime-picker";
 import moment from "moment";
 import qs from "query-string";
 import { getLocation, getVehicles } from "../services/backendCallService";
+import { toast } from "react-toastify";
 
 class CarSearchForm extends Component {
   state = {
@@ -66,11 +67,38 @@ class CarSearchForm extends Component {
   };
 
   handleSubmit = async e => {
+    //toast.error("component did mount");
     e.preventDefault();
     //console.log("form submitted!!", this.state.data);
 
-    //TO DOvalidate fields
-
+    //TO DO validate fields
+    //1. check start date is valid
+    if (!moment(this.state.data.startDate).isSameOrAfter(moment(new Date()))) {
+      toast.error("Invalid start date");
+      return;
+    }
+    //2. check end date is greater then start date
+    if (
+      !moment(this.state.data.endDate).isAfter(
+        moment(this.state.data.startDate)
+      )
+    ) {
+      toast.error("Invalid end date");
+      return;
+    }
+    //3. check if range between start and end date is 72 hrs
+    if (
+      moment
+        .duration(
+          moment(this.state.data.endDate).diff(
+            moment(this.state.data.startDate)
+          )
+        )
+        .asHours() > 72
+    ) {
+      toast.error("Max booking time for vehicle is 72 hrs");
+      return;
+    }
     //call backend
     try {
       const data = {};

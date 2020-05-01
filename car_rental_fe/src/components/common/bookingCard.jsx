@@ -73,7 +73,7 @@ class BookingCard extends Component {
               <hr />
               <p className="card-text float-right">
                 <MdLocationOn />
-                {"location"}
+                {vehicleObject.location}
               </p>
               <span className="badge badge-light">
                 Checkout : {moment(checkOut).format("ddd MMM DD HH:mm")}

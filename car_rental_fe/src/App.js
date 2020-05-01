@@ -11,6 +11,8 @@ import auth from "./services/authService";
 import "./App.css";
 import MyProfile from "./components/myProfile";
 import AdminDashboard from "./components/admin";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 class App extends Component {
   state = {};
@@ -24,6 +26,8 @@ class App extends Component {
     const { user } = this.state;
     return (
       <React.Fragment>
+        <ToastContainer />
+
         <NavBar user={user} />
         {/* <button className="btn btn-primary">showing button</button> */}
         <div className="container">
