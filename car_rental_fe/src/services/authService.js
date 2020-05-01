@@ -16,6 +16,10 @@ export async function login(data) {
   localStorage.setItem(tokenKey, jwt["token"]);
 }
 
+export function registerUser(data) {
+  return http.post(apiUrl + "/register", data);
+}
+
 export function loginWithJwt(jwt) {
   localStorage.setItem(tokenKey, jwt);
 }

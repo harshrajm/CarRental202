@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import UsStates from "./common/usStatesDropdown";
+import { registerUser } from "../services/authService";
+import { toast } from "react-toastify";
 
 class RegisterForm extends Component {
   state = {
@@ -22,10 +24,22 @@ class RegisterForm extends Component {
     this.setState({ data });
   };
 
-  handleSubmit = e => {
+  handleSubmit = async e => {
     e.preventDefault();
     console.log("form submitted!!");
     //do http call
+    const { data } = this.state;
+    data["name"] = this.state.data.username;
+    try {
+      await registerUser(data);
+      toast.success("User registered");
+      window.location = "/login";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        console.log("400 error");
+        toast.error(ex.response.data);
+      }
+    }
   };
 
   render() {
