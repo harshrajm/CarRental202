@@ -17,7 +17,8 @@ class CarCard extends Component {
       hourlyRate,
       onBookClick,
       registrationTag,
-      allowSelectAction
+      allowSelectAction,
+      onShowAlternateClick
     } = this.props;
     return (
       <React.Fragment>
@@ -80,7 +81,11 @@ class CarCard extends Component {
                 )}
 
                 {allowSelectAction && !isAvailable && (
-                  <button type="button" className="btn btn-link  float-right">
+                  <button
+                    type="button"
+                    className="btn btn-link  float-right"
+                    onClick={() => onShowAlternateClick(type, location)}
+                  >
                     Find {type} at other locations
                   </button>
                 )}

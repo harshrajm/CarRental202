@@ -5,6 +5,7 @@ import moment from "moment";
 import { IoIosCloseCircle } from "react-icons/io";
 import { postNewBooking } from "../services/backendCallService";
 import qs from "query-string";
+import ShowAlternateVehicles from "./showAlternateVehicles";
 
 class CarBooking extends Component {
   state = {};
@@ -40,6 +41,20 @@ class CarBooking extends Component {
     //handle book click
   };
 
+  handleShowAlternateClick = (type, location) => {
+    //alert(type + " " + location);
+    const alternate = {};
+    alternate["type"] = type;
+    alternate["location"] = location;
+    alternate["checkOut"] = this.state.searchParam.checkOut;
+    alternate["expectedCheckin"] = this.state.searchParam.expectedCheckin;
+    this.setState({ alternate });
+  };
+
+  handleClearAlternate = () => {
+    this.setState({ alternate: undefined });
+  };
+
   render() {
     if (!this.state.vehicles) {
       return (
@@ -49,7 +64,15 @@ class CarBooking extends Component {
         />
       );
     }
-
+    if (this.state.alternate) {
+      return (
+        <ShowAlternateVehicles
+          alternate={this.state.alternate}
+          onClearAlternate={this.handleClearAlternate}
+          onBookClick={this.handleBookClick}
+        />
+      );
+    }
     return (
       <React.Fragment>
         <React.Fragment>
@@ -85,6 +108,12 @@ class CarBooking extends Component {
           </div>
           <hr />
         </React.Fragment>
+        {this.state.vehicles.length === 0 && (
+          <p className="text-center">Nothing to display</p>
+        )}
+        {this.state.vehicles.length > 0 && (
+          <p className="ml-4">Showing {this.state.vehicles.length} option(s)</p>
+        )}
         {this.state.vehicles.map(v => (
           <CarCard
             key={v._id}
@@ -101,6 +130,7 @@ class CarBooking extends Component {
             onBookClick={this.handleBookClick}
             registrationTag={v.registrationTag}
             allowSelectAction={true}
+            onShowAlternateClick={this.handleShowAlternateClick}
           />
         ))}
         {/* <CarCard /> */}

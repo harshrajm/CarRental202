@@ -30,7 +30,6 @@ class ViewAllVehicles extends Component {
             isAvailable={v.isAvailable}
             baseRate={v.baseRate}
             hourlyRate={v.hourlyRate}
-            onBookClick={this.handleBookClick}
             registrationTag={v.registrationTag}
             allowSelectAction={false}
           />

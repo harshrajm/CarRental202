@@ -34,6 +34,15 @@ export function extendMembership() {
 }
 
 export function getUserList() {
-  return http.get(apiUrl + "/admin/manageUsers")
+  return http.get(apiUrl + "/admin/manageUsers");
 }
 
+export function getAlternateVehicles(queryString) {
+  // console.log(
+  //   "getAlternateVehicles => calling " +
+  //     apiUrl +
+  //     "/suggest/vehicles?" +
+  //     queryString
+  // );
+  return http.get(apiUrl + "/suggest/vehicles?" + queryString);
+}
