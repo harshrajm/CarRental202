@@ -32,3 +32,8 @@ export function getUser() {
 export function extendMembership() {
   return http.post(apiUrl + "/user/membership");
 }
+
+export function getUserList() {
+  return http.get(apiUrl + "/admin/manageUsers")
+}
+

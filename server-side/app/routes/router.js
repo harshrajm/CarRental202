@@ -239,6 +239,12 @@ router.post('/register', (req, res) => {
            404 user not found
             
   */
+  
+  router.route('/admin/manageUsers').get((req, res) => {
+   UserDetails.find({role: "Customer"})
+     .then((userInfo) => { res.json(userInfo) })
+    .catch(err => res.status(400).json('Error: ' + err));
+});
   router.delete('/admin/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => {
     console.log('Deleting user', req.body.email);
