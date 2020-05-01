@@ -126,7 +126,7 @@ class CarSearchForm extends Component {
       <div className="row justify-content-center">
         <div className="col-8">
           <div className="card addTopMargin">
-            <div className="card-header">Enter details to book a car</div>
+            <div className="card-header">Enter details to book Vehicle</div>
             <div className="card-body">
               <form onSubmit={this.handleSubmit}>
                 <div className="row">
@@ -198,7 +198,7 @@ class CarSearchForm extends Component {
                   className="btn btn-secondary float-right mr-1"
                   to="/ViewAllVehicles"
                 >
-                  View all vehicles
+                  View all
                 </Link>
               </form>
             </div>
