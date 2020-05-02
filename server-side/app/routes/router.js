@@ -536,6 +536,41 @@ router.post('/register', (req, res) => {
     })
   })
 
+   /*
+  endpoint : /location
+  request type : PUT
+  query parameters : name
+  request body json : address, vehicleCapacity
+  return :  200 and updated Location saved
+            404 location does not exist
+            400 If vehicleCapacity is less than the number of vehicles already there
+  */
+  //create a new location
+  router.put('/location', passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
+  (req,res) => {
+    //check if already exists
+    //ISSUE
+    //Sanjose can have multiple locaitons with different addesses
+    //How do you take care of such cases
+    locationDetails.findOne({ name: req.query.name}).then((loc)=> {
+      if (loc){
+        //check number of vehicles cuurently
+        vehicleDetails.find({location: loc.name}).then((vehicles) => {
+          if (vehicles.length <= req.body.vehicleCapacity) {
+            loc.address = req.body.address;
+            loc.vehicleCapacity = req.body.vehicleCapacity;
+            loc.save();
+            return res.send(loc);
+          } else {
+            return res.status(400).send("This location already has more vehicles than "+ req.body.vehicleCapacity);
+          }
+        })
+      } else {
+        return res.status(400).send("This location name already exists "+obj);
+      }
+    })
+  })
+
   /*
   endpoint : /location
   request type : DELETE
