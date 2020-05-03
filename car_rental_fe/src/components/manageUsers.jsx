@@ -1,24 +1,25 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import { getUserList } from "../services/backendCallService";
-import axios from 'axios';
+import axios from "axios";
 
 export default class ManageUsers extends Component {
   state = { user: [] };
-  
+
   async componentDidMount() {
     const { data: user } = await getUserList();
     this.setState({ user });
 
-    this.deleteUser = this.deleteUser.bind(this)
+    this.deleteUser = this.deleteUser.bind(this);
   }
 
   deleteUser(id) {
-    axios.delete('http://localhost:8080/admin/user'+id)
-      .then(response => { console.log(response.data)});
+    axios.delete("http://localhost:8080/admin/user" + id).then(response => {
+      console.log(response.data);
+    });
 
     this.setState({
       item: this.state.user.filter(el => el._id !== id)
-    })
+    });
   }
 
   getUsersList() {
@@ -30,13 +31,20 @@ export default class ManageUsers extends Component {
           <td>{item.email}</td>
           <td>{item.membershipActive.toString()}</td>
           <td>
-      <a href="#" onClick={() => { item.deleteUser(item._id) }}>Terminate</a>
-    </td>
+            <a
+              href="#"
+              onClick={() => {
+                item.deleteUser(item._id);
+              }}
+            >
+              Terminate
+            </a>
+          </td>
         </tr>
       ));
     }
   }
-  
+
   render() {
     return (
       <div>
@@ -50,12 +58,9 @@ export default class ManageUsers extends Component {
               <th>Membership Active</th>
             </tr>
           </thead>
-          <tbody>
-            {this.getUsersList()}
-          </tbody>
+          <tbody>{this.getUsersList()}</tbody>
         </table>
       </div>
-    )
+    );
   }
 }
-

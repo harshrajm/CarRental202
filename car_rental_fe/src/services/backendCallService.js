@@ -38,11 +38,5 @@ export function getUserList() {
 }
 
 export function getAlternateVehicles(queryString) {
-  // console.log(
-  //   "getAlternateVehicles => calling " +
-  //     apiUrl +
-  //     "/suggest/vehicles?" +
-  //     queryString
-  // );
   return http.get(apiUrl + "/suggest/vehicles?" + queryString);
 }

@@ -129,7 +129,7 @@ class CarSearchForm extends Component {
             <div className="card-header">Enter details to book Vehicle</div>
             <div className="card-body">
               <form onSubmit={this.handleSubmit}>
-                <div className="row">
+                <div className="row text-center">
                   <div className="col-4">
                     <div className="form-group">
                       <label htmlFor="locationSelect">Pickup Location</label>
