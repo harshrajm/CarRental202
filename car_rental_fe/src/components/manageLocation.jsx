@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { FaEdit } from "react-icons/fa";
+import { BsPlus } from "react-icons/bs";
 
 const Location = props => (
   <tr>
@@ -8,7 +10,7 @@ const Location = props => (
     <td>{props.location.address}</td>
     <td>{props.location.vehicleCapacity}</td>
     <td>
-      <Link to={"/edit/" + props.location.name}>edit</Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}>delete</a>
+      <Link to={"/edit/" + props.location.name}><FaEdit /></Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}>delete</a>
     </td>
   </tr>
 )
@@ -50,10 +52,12 @@ export default class ManageLocation extends Component {
   render() {
     return (
       <div>
-        <h3>Manage Locations</h3>
-
+        <Link to="/createlocation" className="btn btn-primary float-right">
+          <BsPlus /> Add Location
+        </Link>
+        <h2>Manage Locations</h2>
         <table className="table">
-          <thead className="thead-light">
+          <thead>
             <tr>
               <th>Name</th>
               <th>Address</th>
@@ -65,8 +69,6 @@ export default class ManageLocation extends Component {
             { this.locationList() }
           </tbody>
         </table>
-
-        <Link to="/createlocation">+ create</Link>
       </div>
     )
   }

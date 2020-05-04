@@ -9,7 +9,7 @@ const User = props => (
     <td>{props.user.email}</td>
     <td>{props.user.membershipActive.toString()}</td>
     <td>
-      <button onClick={() => { props.deleteUser(props.user.email) }}>terminate</button>
+      <button className="btn btn-primary" onClick={() => { props.deleteUser(props.user.email) }}>terminate</button>
     </td>
   </tr>
 )
