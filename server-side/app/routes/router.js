@@ -165,7 +165,7 @@ router.post('/register', (req, res) => {
         UserDetails.findOne({email: req.user.email}).then((user) => {
           if (user){
             //Check active bookings
-            bookingDetails.find({$query: {email: req.user.email, isActive: 1}}).then((b)=> {
+            bookingDetails.find({$query: {email: req.user.email, isActive: true}}).then((b)=> {
               if (Array.isArray(b) && (b.length == 0)) {
                 UserDetails.deleteOne({email: req.user.email}).then((obj)=> {
                   if (obj.ok != 1){
