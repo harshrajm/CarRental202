@@ -28,7 +28,14 @@ class VehiclesTable extends Component {
                 <td>{v.registrationTag}</td>
                 <td>{v.name}</td>
                 <td>{v.manufacturer}</td>
-                <td>{v.location}</td>
+                {v.location === "UNASSIGNED" ? (
+                  <td>
+                    <span className="badge badge-danger">UNASSIGNED</span>
+                  </td>
+                ) : (
+                  <td>{v.location}</td>
+                )}
+
                 <td>
                   <button
                     onClick={() => this.props.onGoToEditVehicle(v)}

@@ -65,3 +65,7 @@ export function deleteUser(data) {
   console.log("in deleteUser " + apiUrl + "/user");
   return http.delete(apiUrl + "/user", data);
 }
+
+export function deleteLocation(id) {
+  return http.delete(apiUrl + "/location/?name=" + id);
+}

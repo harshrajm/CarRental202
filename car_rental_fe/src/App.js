@@ -71,12 +71,12 @@ class App extends Component {
                 render={props => <AdminDashboard {...props} user={user} />}
               />
             )}
-            <Route
+            {/* <Route
               path="/createlocation"
               render={props => <CreateLocation {...props} user={user} />}
-            />
+            /> */}
 
-            <Route path="/edit/:name" component={EditLocation} />
+            {/* <Route path="/edit/:name" component={EditLocation} /> */}
             <Route path="/not-found" component={NotFound} />
             {user && user.isAdmin ? (
               <Redirect from="/" exact to="/admin" />

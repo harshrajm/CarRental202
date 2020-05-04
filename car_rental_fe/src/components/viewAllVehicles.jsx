@@ -7,7 +7,8 @@ import { BsArrowLeftShort } from "react-icons/bs";
 class ViewAllVehicles extends Component {
   state = { vehicles: [] };
   async componentDidMount() {
-    const { data: vehicles } = await getVehicles();
+    let { data: vehicles } = await getVehicles();
+    vehicles = vehicles.filter(v => v.location !== "UNASSIGNED");
     this.setState({ vehicles });
   }
 

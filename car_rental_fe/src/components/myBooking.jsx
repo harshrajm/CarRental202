@@ -20,9 +20,16 @@ class MyBooking extends Component {
     this.setState({ showModal: false });
   };
 
-  async componentDidMount() {
-    const { data: bookings } = await getBookings();
+  async loadBookings() {
+    let { data: bookings } = await getBookings();
+    bookings = bookings.sort(
+      (a, b) => new Date(b.checkOut) - new Date(a.checkOut)
+    );
     this.setState({ bookings });
+  }
+
+  async componentDidMount() {
+    await this.loadBookings();
     //console.log(bookings);
   }
 
@@ -37,12 +44,13 @@ class MyBooking extends Component {
   };
 
   handleCancelBooking = async id => {
-    alert("cancel " + id);
+    //alert("cancel " + id);
     //backend call
     try {
       await cancelBooking(id);
-      const { data: bookings } = await getBookings();
-      this.setState({ bookings });
+      //const { data: bookings } = await getBookings();
+      //this.setState({ bookings });
+      await this.loadBookings();
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");
@@ -73,8 +81,9 @@ class MyBooking extends Component {
       //backend call
       await postReturnVehicle(qs.stringify(data), data);
       //update state with new list
-      const { data: bookings } = await getBookings();
-      this.setState({ bookings, showModal: false });
+      //const { data: bookings } = await getBookings();
+      await this.loadBookings();
+      this.setState({ showModal: false });
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");

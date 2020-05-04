@@ -1,50 +1,69 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { deleteOneUser } from "../services/backendCallService";
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { deleteOneUser, getUserList } from "../services/backendCallService";
+import { toast } from "react-toastify";
+
 const User = props => (
   <tr>
     <td>{props.user.name}</td>
     <td>{props.user.username}</td>
     <td>{props.user.email}</td>
-    <td>{props.user.membershipActive.toString()}</td>
     <td>
-      <button className="btn btn-primary" onClick={() => { props.deleteUser(props.user.email) }}>terminate</button>
+      {props.user.membershipActive ? (
+        <span className="badge badge-success">Active</span>
+      ) : (
+        <span className="badge badge-danger">Inactive</span>
+      )}
+    </td>
+    <td>
+      <button
+        className="btn btn-danger"
+        onClick={() => {
+          props.deleteUser(props.user.email);
+        }}
+      >
+        Terminate
+      </button>
     </td>
   </tr>
-)
+);
 
 export default class ManageUsers extends Component {
   constructor(props) {
     super(props);
 
-    this.deleteUser = this.deleteUser.bind(this)
+    this.deleteUser = this.deleteUser.bind(this);
 
-    this.state = {user: []};
+    this.state = { user: [] };
   }
 
-  componentDidMount() {
-    axios.get('http://localhost:8080/admin/manageUsers')
-      .then(response => {
-        this.setState({ user: response.data })
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+  async componentDidMount() {
+    const { data: user } = await getUserList();
+    this.setState({ user });
+    // axios
+    //   .get("http://localhost:8080/admin/manageUsers")
+    //   .then(response => {
+    //     this.setState({ user: response.data });
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   }
 
   deleteUser = async email => {
-    var q = {email:email};
+    var q = { email: email };
     var data = await deleteOneUser(q);
     this.setState({
       user: this.state.user.filter(el => el.email !== email)
-    })
-  }
-  
+    });
+    toast.success("user deleted");
+  };
+
   userList() {
     return this.state.user.map(item => {
-      return <User user={item} deleteUser={this.deleteUser} key={item.email}/>;
-    })
+      return <User user={item} deleteUser={this.deleteUser} key={item.email} />;
+    });
   }
 
   render() {
@@ -57,13 +76,11 @@ export default class ManageUsers extends Component {
               <th>Name</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Membership Active</th>
-              <th>Actions</th>
+              <th>Membership</th>
+              <th></th>
             </tr>
           </thead>
-          <tbody>
-            { this.userList() }
-          </tbody>
+          <tbody>{this.userList()}</tbody>
         </table>
       </div>
     );

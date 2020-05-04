@@ -4,6 +4,8 @@ import axios from "axios";
 import { FaEdit } from "react-icons/fa";
 import { BsPlus } from "react-icons/bs";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { getLocation, deleteLocation } from "../services/backendCallService";
+import { toast } from "react-toastify";
 
 const Location = props => (
   <tr>
@@ -13,8 +15,11 @@ const Location = props => (
     <td>
       {props.location.name !== "UNASSIGNED" && (
         <React.Fragment>
-          <Link className="btn btn-link" to={"/edit/" + props.location.name}>
-            edit{" "}
+          <Link
+            className="btn btn-link"
+            to={"/admin/location/edit/" + props.location.name}
+          >
+            <FaEdit />
           </Link>
           <button
             href="#"
@@ -23,7 +28,7 @@ const Location = props => (
               props.deleteLocation(props.location.name);
             }}
           >
-            delete
+            <RiDeleteBin6Line />
           </button>
         </React.Fragment>
       )}
@@ -40,27 +45,34 @@ export default class ManageLocation extends Component {
     this.state = { location: [] };
   }
 
-  componentDidMount() {
-    axios
-      .get("http://localhost:8080/locations/")
-      .then(response => {
-        this.setState({ location: response.data });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+  async componentDidMount() {
+    //added by harshraj
+    const { data: location } = await getLocation();
+    this.setState({ location });
+    // axios
+    //   .get("http://localhost:8080/locations/")
+    //   .then(response => {
+    //     this.setState({ location: response.data });
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   });
   }
 
-  deleteLocation(id) {
-    axios
-      .delete("http://localhost:8080/location/?name=" + id)
-      .then(response => {
-        console.log(response.data);
-      });
-
-    this.setState({
-      location: this.state.location.filter(el => el.name !== id)
-    });
+  async deleteLocation(id) {
+    // axios
+    //   .delete("http://localhost:8080/location/?name=" + id)
+    //   .then(response => {
+    //     console.log(response.data);
+    //   });
+    try {
+      await deleteLocation(id);
+      const { data: location } = await getLocation();
+      this.setState({ location });
+      toast.success("Location deleted");
+    } catch (ex) {
+      toast.error("Unable to delete location");
+    }
   }
 
   locationList() {
@@ -78,7 +90,10 @@ export default class ManageLocation extends Component {
   render() {
     return (
       <div>
-        <Link to="/createlocation" className="btn btn-primary float-right">
+        <Link
+          to="/admin/location/createlocation"
+          className="btn btn-primary float-right"
+        >
           <BsPlus /> Add Location
         </Link>
         <h2>Manage Locations</h2>
@@ -88,7 +103,7 @@ export default class ManageLocation extends Component {
               <th>Name</th>
               <th>Address</th>
               <th>Vehicle Capacity</th>
-              <th>Actions</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>{this.locationList()}</tbody>

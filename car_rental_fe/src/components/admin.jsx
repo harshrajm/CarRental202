@@ -5,6 +5,8 @@ import ManageLocation from "./manageLocation";
 import { Route, Redirect, Switch } from "react-router-dom";
 import ManageVehicle from "./manageVehicle";
 import ManageUsers from "./manageUsers";
+import CreateLocation from "./createLocation";
+import EditLocation from "./editLocation";
 class AdminDashboard extends Component {
   state = {};
 
@@ -48,11 +50,22 @@ class AdminDashboard extends Component {
                 )}
               />
               <Route
+                path="/admin/location/createlocation"
+                render={props => (
+                  <CreateLocation {...props} user={this.props.user} />
+                )}
+              />
+              <Route
+                path="/admin/location/edit/:name"
+                component={EditLocation}
+              />
+              <Route
                 path="/admin/location"
                 render={props => (
                   <ManageLocation {...props} user={this.props.user} />
                 )}
               />
+
               <Route
                 path="/admin/vehicle"
                 render={props => (

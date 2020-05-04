@@ -19,22 +19,23 @@ class CarSearchForm extends Component {
       selectedLocation: ""
     },
     locations: [
-      {
-        _id: "5e95650dc764413c1e8b396c",
-        name: "San Jose",
-        address: "101 E San Fernando Street"
-      },
-      {
-        _id: "5e95650dc764413c1e8b396a",
-        name: "Santa Clara",
-        address: "Vista Montana"
-      }
+      // {
+      //   _id: "5e95650dc764413c1e8b396c",
+      //   name: "San Jose",
+      //   address: "101 E San Fernando Street"
+      // },
+      // {
+      //   _id: "5e95650dc764413c1e8b396a",
+      //   name: "Santa Clara",
+      //   address: "Vista Montana"
+      // }
     ]
   };
 
   async componentDidMount() {
-    const { data: locations } = await getLocation();
+    let { data: locations } = await getLocation();
     //console.log(locations);
+    locations = locations.filter(l => l.name !== "UNASSIGNED");
     this.state.data.selectedLocation = locations[0].name;
     this.setState({
       locations //: locations.map(each => ({

@@ -6,6 +6,7 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { postNewBooking } from "../services/backendCallService";
 import qs from "query-string";
 import ShowAlternateVehicles from "./showAlternateVehicles";
+import { toast } from "react-toastify";
 
 class CarBooking extends Component {
   state = {};
@@ -22,6 +23,7 @@ class CarBooking extends Component {
     //if not auth redirect
     if (!this.props.user) {
       //window.location = "/login";
+      toast.error("Login to book vehicle");
       this.props.history.push("/login");
       //alert("Login to book");
     } else {
@@ -33,8 +35,10 @@ class CarBooking extends Component {
       try {
         await postNewBooking(qs.stringify(data));
         console.log("booking placed");
+        toast.success("Car Booked!");
         this.props.history.push("/myBookings");
       } catch (ex) {
+        toast.error("Error Booking Car");
         console.log("error in postNewBooking");
       }
     }
@@ -49,6 +53,7 @@ class CarBooking extends Component {
     alternate["checkOut"] = this.state.searchParam.checkOut;
     alternate["expectedCheckin"] = this.state.searchParam.expectedCheckin;
     this.setState({ alternate });
+    toast.success("Showing " + type + " at other locations");
   };
 
   handleClearAlternate = () => {
