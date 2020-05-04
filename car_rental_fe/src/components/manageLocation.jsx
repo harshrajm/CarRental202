@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { FaEdit } from "react-icons/fa";
+import { BsPlus } from "react-icons/bs";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const Location = props => (
   <tr>
@@ -75,10 +78,12 @@ export default class ManageLocation extends Component {
   render() {
     return (
       <div>
-        <h3>Manage Locations</h3>
-
+        <Link to="/createlocation" className="btn btn-primary float-right">
+          <BsPlus /> Add Location
+        </Link>
+        <h2>Manage Locations</h2>
         <table className="table">
-          <thead className="thead-light">
+          <thead>
             <tr>
               <th>Name</th>
               <th>Address</th>
@@ -88,8 +93,6 @@ export default class ManageLocation extends Component {
           </thead>
           <tbody>{this.locationList()}</tbody>
         </table>
-
-        <Link to="/createlocation">+ create</Link>
       </div>
     );
   }
