@@ -52,18 +52,17 @@ class App extends Component {
               path="/viewAllVehicles"
               render={props => <ViewAllVehicles {...props} user={user} />}
             />
-            {user && !user.isAdmin && (
-              <Route
-                path="/myBookings"
-                render={props => <MyBooking {...props} user={user} />}
-              />
-            )}
-            {user && !user.isAdmin && (
-              <Route
-                path="/profile"
-                render={props => <MyProfile {...props} user={user} />}
-              />
-            )}
+
+            <Route
+              path="/myBookings"
+              render={props => <MyBooking {...props} user={user} />}
+            />
+
+            <Route
+              path="/profile"
+              render={props => <MyProfile {...props} user={user} />}
+            />
+
             {user && user.isAdmin && (
               <Route
                 path="/admin"
