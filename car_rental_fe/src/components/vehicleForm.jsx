@@ -14,7 +14,7 @@ class VehicleForm extends Component {
     data: {
       hourlyRate: [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11],
       type: "Sedan",
-      location: "Santa Clara",
+      location: "UNASSIGNED",
       name: "",
       registrationTag: "",
       manufacturer: "",
