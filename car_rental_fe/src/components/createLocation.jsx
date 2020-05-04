@@ -45,7 +45,7 @@ class CreateLocation extends Component {
     return (
       <React.Fragment>
       {this.state.redirect ? <Redirect to="/admin/location"  /> : ''}
-        <h3>Create Location</h3>
+        <h3>Add Location</h3>
         <form>
           <div className="form-group">
             <label>Name</label>
@@ -59,7 +59,7 @@ class CreateLocation extends Component {
             <label>Vehicle Capacity</label>
             <input type="Number" className="form-control" placeholder="Vehicle Capacity" onKeyUp={this.handleInputChange} name="vehicleCapacity"/>
           </div>
-          <button type="submit" className="btn btn-primary" onClick={this.handleCreate}>Create Location</button>
+          <button type="submit" className="btn btn-primary" onClick={this.handleCreate}>Add Location</button>
         </form>
         
         

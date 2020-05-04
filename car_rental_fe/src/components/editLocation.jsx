@@ -80,7 +80,7 @@ export default class EditLocation extends Component {
         </div>
 
         <div className="form-group">
-          <input type="submit" value="Edit Location" className="btn btn-primary" />
+          <input type="submit" value="Update Location" className="btn btn-primary" />
         </div>
       </form>
     </div>
