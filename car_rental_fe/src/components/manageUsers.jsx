@@ -1,53 +1,50 @@
-import React, { Component } from "react";
-import { getUserList, deleteUser } from "../services/backendCallService";
-import { toast } from "react-toastify";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { deleteOneUser } from "../services/backendCallService";
+const User = props => (
+  <tr>
+    <td>{props.user.name}</td>
+    <td>{props.user.username}</td>
+    <td>{props.user.email}</td>
+    <td>{props.user.membershipActive.toString()}</td>
+    <td>
+      <button onClick={() => { props.deleteUser(props.user.email) }}>terminate</button>
+    </td>
+  </tr>
+)
 
 export default class ManageUsers extends Component {
-  state = { user: [] };
+  constructor(props) {
+    super(props);
 
-  async componentDidMount() {
-    const { data: user } = await getUserList();
-    this.setState({ user });
+    this.deleteUser = this.deleteUser.bind(this)
+
+    this.state = {user: []};
   }
 
-  handleDelete = async email => {
-    alert("to delete " + email);
-    const data = {};
-    data["email"] = email;
-    try {
-      //await deleteUser(data);
-      toast.success("user deleted");
-    } catch (ex) {
-      toast.error("Error deleting user");
-    }
-  };
+  componentDidMount() {
+    axios.get('http://localhost:8080/admin/manageUsers')
+      .then(response => {
+        this.setState({ user: response.data })
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
 
-  getUsersList() {
-    if (this.state.user) {
-      return this.state.user.map(item => (
-        <tr>
-          <td>{item.name}</td>
-          <td>{item.username}</td>
-          <td>{item.email}</td>
-          <td>
-            {item.membershipActive ? (
-              <span class="badge badge-success">Active</span>
-            ) : (
-              <span class="badge badge-danger">Inactive</span>
-            )}
-          </td>
-          <td>
-            <button
-              onClick={() => this.handleDelete(item.email)}
-              className="btn btn-link"
-            >
-              <RiDeleteBin6Line />
-            </button>
-          </td>
-        </tr>
-      ));
-    }
+  deleteUser = async email => {
+    var q = {email:email};
+    var data = await deleteOneUser(q);
+    this.setState({
+      user: this.state.user.filter(el => el.email !== email)
+    })
+  }
+  
+  userList() {
+    return this.state.user.map(item => {
+      return <User user={item} deleteUser={this.deleteUser} key={item.email}/>;
+    })
   }
 
   render() {
@@ -60,11 +57,13 @@ export default class ManageUsers extends Component {
               <th>Name</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Membership</th>
-              <th></th>
+              <th>Membership Active</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody>{this.getUsersList()}</tbody>
+          <tbody>
+            { this.userList() }
+          </tbody>
         </table>
       </div>
     );

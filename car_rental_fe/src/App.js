@@ -14,6 +14,8 @@ import AdminDashboard from "./components/admin";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ViewAllVehicles from "./components/viewAllVehicles";
+import EditLocation from "./components/editLocation";
+import CreateLocation from "./components/createLocation";
 
 class App extends Component {
   state = {};
@@ -52,6 +54,7 @@ class App extends Component {
               path="/viewAllVehicles"
               render={props => <ViewAllVehicles {...props} user={user} />}
             />
+
             {user && !user.isAdmin && (
               <Route
                 path="/myBookings"
@@ -70,6 +73,7 @@ class App extends Component {
                 render={props => <AdminDashboard {...props} user={user} />}
               />
             )}
+
 
             <Route path="/not-found" component={NotFound} />
             {user && user.isAdmin ? (
