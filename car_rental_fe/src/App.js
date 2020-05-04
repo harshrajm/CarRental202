@@ -18,13 +18,19 @@ import ViewAllVehicles from "./components/viewAllVehicles";
 class App extends Component {
   state = {};
 
-  componentDidMount() {
+  static getDerivedStateFromProps(props, state) {
     const user = auth.getCurrentUser();
-    this.setState({ user });
+    return { user };
   }
+
+  // componentDidMount() {
+  //   const user = auth.getCurrentUser();
+  //   this.setState({ user });
+  // }
 
   render() {
     const { user } = this.state;
+
     return (
       <React.Fragment>
         <ToastContainer />
@@ -36,29 +42,42 @@ class App extends Component {
             <Route path="/register" component={RegisterForm} />
             <Route path="/login" component={LoginForm} />
             <Route path="/logout" component={Logout} />
-            <Route
-              path="/book"
-              render={props => <CarBooking {...props} user={user} />}
-            />
+            {(!user || (user && !user.isAdmin)) && (
+              <Route
+                path="/book"
+                render={props => <CarBooking {...props} user={user} />}
+              />
+            )}
             <Route
               path="/viewAllVehicles"
               render={props => <ViewAllVehicles {...props} user={user} />}
             />
-            <Route
-              path="/myBookings"
-              render={props => <MyBooking {...props} user={user} />}
-            />
-            <Route
-              path="/profile"
-              render={props => <MyProfile {...props} user={user} />}
-            />
-            <Route
-              path="/admin"
-              render={props => <AdminDashboard {...props} user={user} />}
-            />
+            {user && !user.isAdmin && (
+              <Route
+                path="/myBookings"
+                render={props => <MyBooking {...props} user={user} />}
+              />
+            )}
+            {user && !user.isAdmin && (
+              <Route
+                path="/profile"
+                render={props => <MyProfile {...props} user={user} />}
+              />
+            )}
+            {user && user.isAdmin && (
+              <Route
+                path="/admin"
+                render={props => <AdminDashboard {...props} user={user} />}
+              />
+            )}
 
             <Route path="/not-found" component={NotFound} />
-            <Redirect from="/" exact to="/book" />
+            {user && user.isAdmin ? (
+              <Redirect from="/" exact to="/admin" />
+            ) : (
+              <Redirect from="/" exact to="/book" />
+            )}
+            {/* <Redirect from="/" exact to="/book" /> */}
             <Redirect to="/not-found" />
           </Switch>
         </div>

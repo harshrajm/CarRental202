@@ -337,7 +337,7 @@ class VehicleForm extends Component {
               </table>
             </div>
             <button type="submit" className="btn btn-primary ml-3">
-              {this.state.edit ? "Edit Vehicle" : "Add Vehicle"}
+              {this.state.edit ? "Update Vehicle" : "Add Vehicle"}
             </button>
           </div>
         </form>
