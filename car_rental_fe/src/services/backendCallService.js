@@ -44,3 +44,6 @@ export function getAlternateVehicles(queryString) {
 export function addVehicle(data) {
   return http.post(apiUrl + "/vehicle", data);
 }
+export function editVehicle(data, registrationTag) {
+  return http.put(apiUrl + "/vehicle?registrationTag=" + registrationTag, data);
+}

@@ -17,6 +17,14 @@ class ManageVehicle extends Component {
     this.setState({ vehicles });
   };
 
+  dispatchEditVehicle = v => {
+    //alert("dispatchEditVehicle");
+    //console.log(v);
+    const vehicleToEdit = { ...v };
+    this.setState({ vehicleToEdit });
+    this.props.history.replace("/admin/vehicle/edit");
+  };
+
   render() {
     const { vehicles } = this.state;
     return (
@@ -29,14 +37,28 @@ class ManageVehicle extends Component {
           /> */}
           <Route
             path="/admin/vehicle/add"
-            render={(props, vehicles) => (
+            render={props => (
               <VehicleForm {...props} onReload={this.handleReload} />
             )}
           />
           <Route
+            path="/admin/vehicle/edit"
+            render={props => (
+              <VehicleForm
+                {...props}
+                onReload={this.handleReload}
+                vehicleToEdit={this.state.vehicleToEdit}
+              />
+            )}
+          />
+          <Route
             path="/admin/vehicle/"
-            render={(props, vehicles) => (
-              <VehiclesTable {...props} vehicles={this.state.vehicles} />
+            render={props => (
+              <VehiclesTable
+                {...props}
+                vehicles={this.state.vehicles}
+                onGoToEditVehicle={this.dispatchEditVehicle}
+              />
             )}
           />
         </Switch>

@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { BsPlus } from "react-icons/bs";
+
+import { FaEdit } from "react-icons/fa";
+
 class VehiclesTable extends Component {
   render() {
     return (
       <React.Fragment>
         <Link to="/admin/vehicle/add" className="btn btn-primary float-right">
-          Add Vehicle
+          <BsPlus /> Add Vehicle
         </Link>
         <h2>Manage Vehicles</h2>
         <table className="table text-center">
@@ -26,7 +30,13 @@ class VehiclesTable extends Component {
                 <td>{v.manufacturer}</td>
                 <td>{v.location}</td>
                 <td>
-                  <Link>Edit</Link>
+                  <button
+                    onClick={() => this.props.onGoToEditVehicle(v)}
+                    className="btn btn-link"
+                  >
+                    <FaEdit />
+                  </button>
+                  {/* <Link to="/admin/vehicle/edit" >Edit</Link> */}
                 </td>
               </tr>
             ))}

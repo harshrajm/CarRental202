@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { BsArrowLeftShort } from "react-icons/bs";
-import { getLocation, addVehicle } from "../services/backendCallService";
+import {
+  getLocation,
+  addVehicle,
+  editVehicle
+} from "../services/backendCallService";
 import DateTimePicker from "react-datetime-picker";
 import { toast } from "react-toastify";
 
@@ -10,7 +14,7 @@ class VehicleForm extends Component {
     data: {
       hourlyRate: [25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11],
       type: "Sedan",
-      location: "San Jose",
+      location: "Santa Clara",
       name: "",
       registrationTag: "",
       manufacturer: "",
@@ -18,7 +22,8 @@ class VehicleForm extends Component {
       lateFees: "",
       modelYear: "",
       lastService: "",
-      vehicleImageURL: "",
+      vehicleImageURL:
+        "https://cdn.pixabay.com/photo/2016/04/01/09/11/car-1299198_960_720.png",
       condition: "good",
       baseRate: "",
       modelYear: new Date(),
@@ -32,7 +37,14 @@ class VehicleForm extends Component {
 
   async componentDidMount() {
     const { data: locations } = await getLocation();
-    this.setState({ locations });
+
+    if (this.props.vehicleToEdit) {
+      const { vehicleToEdit: data } = this.props;
+
+      this.setState({ edit: true, data, locations });
+    } else {
+      this.setState({ locations });
+    }
   }
 
   handleChange = ({ currentTarget: input }) => {
@@ -52,14 +64,19 @@ class VehicleForm extends Component {
     const { data } = this.state;
     console.log(data);
     try {
-      alert("handle submit");
-      const resp = await addVehicle(data);
+      if (this.state.edit) {
+        await editVehicle(data, data.registrationTag);
+        toast.success("Vehicle Edited");
+      } else {
+        await addVehicle(data);
+        toast.success("Vehicle Added");
+      }
       this.props.onReload();
       this.props.history.replace("/admin/vehicle");
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");
-        toast.alert("error occured");
+        toast.error("error occured");
       }
     }
   };
@@ -83,12 +100,17 @@ class VehicleForm extends Component {
   };
 
   render() {
+    const { data } = this.state;
+    let filterdLoc = this.state.locations.filter(
+      option => option.name === this.state.data.location
+    );
+    filterdLoc = filterdLoc && filterdLoc.length ? filterdLoc[0].name : null;
     return (
       <React.Fragment>
         <Link className="btn btn-link float-right" to="/admin/vehicle/">
           <BsArrowLeftShort /> Back
         </Link>
-        <h2>Add Vehicle</h2>
+        {this.state.edit ? <h2>Edit Vehicle</h2> : <h2>Add Vehicle</h2>}
         <form onSubmit={this.handleSubmit}>
           <div className="row">
             <div className="col-4">
@@ -97,7 +119,7 @@ class VehicleForm extends Component {
                 <select
                   name="type"
                   className="form-control"
-                  id="locationSelect"
+                  //id="locationSelect"
                   onChange={this.handleChange}
                   //value={this.state.data.type}
                   value={this.state.vehicleType.filter(
@@ -115,6 +137,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Name</label>
                 <input
+                  value={data.name}
                   name="name"
                   onChange={this.handleChange}
                   required
@@ -126,6 +149,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Manufacturer</label>
                 <input
+                  value={data.manufacturer}
                   name="manufacturer"
                   onChange={this.handleChange}
                   required
@@ -137,6 +161,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Registraton Number</label>
                 <input
+                  value={data.registrationTag}
                   name="registrationTag"
                   onChange={this.handleChange}
                   required
@@ -148,6 +173,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Image Url</label>
                 <input
+                  value={data.vehicleImageURL}
                   name="vehicleImageURL"
                   onChange={this.handleChange}
                   required
@@ -186,15 +212,11 @@ class VehicleForm extends Component {
                   id="locationSelect"
                   onChange={this.handleChange}
                   //value={this.state.data.location}
-                  value={
-                    this.state.locations.filter(
-                      option => option.name === this.state.data.location
-                    ).name
-                  }
+                  value={filterdLoc}
                   required
                 >
                   {this.state.locations.map(l => (
-                    <option key={l._id} value={l.name}>
+                    <option key={l.name} value={l.name}>
                       {l.name}
                     </option>
                   ))}
@@ -203,6 +225,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Base rate</label>
                 <input
+                  value={data.baseRate}
                   name="baseRate"
                   onChange={this.handleChange}
                   required
@@ -233,6 +256,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Late fees</label>
                 <input
+                  value={data.lateFees}
                   name="lateFees"
                   onChange={this.handleChange}
                   required
@@ -244,6 +268,7 @@ class VehicleForm extends Component {
               <div className="form-group">
                 <label>Current Milage</label>
                 <input
+                  value={data.mileage}
                   name="mileage"
                   onChange={this.handleChange}
                   required
@@ -257,7 +282,7 @@ class VehicleForm extends Component {
                 <br />
                 <DateTimePicker
                   onChange={this.onChangeLastService}
-                  value={this.state.data.lastService}
+                  value={new Date(this.state.data.lastService)}
                   clearIcon={null}
                 />
               </div>
@@ -266,7 +291,7 @@ class VehicleForm extends Component {
                 <br />
                 <DateTimePicker
                   onChange={this.onChangeModelYear}
-                  value={this.state.data.modelYear}
+                  value={new Date(this.state.data.modelYear)}
                   clearIcon={null}
                 />
               </div>
@@ -312,7 +337,7 @@ class VehicleForm extends Component {
               </table>
             </div>
             <button type="submit" className="btn btn-primary ml-3">
-              Add Vehicle
+              {this.state.edit ? "Edit Vehicle" : "Add Vehicle"}
             </button>
           </div>
         </form>
