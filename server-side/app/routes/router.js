@@ -11,6 +11,7 @@ var locationDetails = require('../config/passport').LocationDetails;
 var booking = require('../config/passport').booking;
 var location = require('../config/passport').location;
 var membershipDetails = require('../config/passport').MiscDetails;
+
 const jwt = require('jsonwebtoken');
 const keys = 'secret';
 const moment = require('moment-timezone');
@@ -509,7 +510,6 @@ router.post('/register', (req, res) => {
   router.get('/locations', (req, res) => {
     locationDetails.find({}).then((obj) => {
       if (obj){
-        
         return res.send(obj);
       } else {
         return res.status(404).send("No locations exist");
@@ -1122,7 +1122,7 @@ router.get('/suggest/vehicles', async (req,res) => {
   var booking_query = {};
   var numberOfHours = 0;
   if (req.query.location){
-      query.location = { $ne: req.query.location };
+      query.location = { $nin: [req.query.location, "UNASSIGNED"] };
   }
   if (req.query.type){
       query.type = req.query.type;
@@ -1256,16 +1256,64 @@ function convertVehicle(v){
   return v;
 }
 
+/*endpoint to access the membership fee
+endpoint : /membershipFee
+  request type : GET
+  return : 404 booking not found*/
+  
 router.get('/membershipFee', passport.authenticate('jwt', {session: false}), (req, res) => {
   membershipDetails.find({}).then((obj) => {
     if (obj){
-      
+      console.log("Sent membership fee details");
       return res.send(obj);
     } else {
       return res.status(404).send("No Membership Fee");
     }
-  });
-});
+  })
+})
 
+/*admin endpoint : /feechange
+  request type : POST
+  return : 500 Invalid Input
+           404 no membership fee*/
+
+router.post('/feechange', passport.authenticate('jwt', {session: false}), 
+              User.checkIsInRole(User.Roles.Admin),(req, res) => 
+{
+  membershipDetails.find({}).then((obj) => 
+  {
+    var c = req.body[0].membershipFee;
+    console.log(c);
+    if (obj)
+    { 
+      if (c < 0)
+      { 
+        res.status(500).send('Invalid input. Update failed');
+      }
+      else
+      {
+        membershipDetails.updateOne({}, {membershipFee: c}).then((obj) => 
+        {
+            if (obj.ok != 1) 
+            {
+              console.log("Membership fee update error");
+              console.log(err);
+              res.status(500).send('Membershipfee update failed');
+            } 
+            else 
+            {
+              var returnstr = "Membership fee updated to " + c; 
+              res.send(returnstr);
+              //user should be redirected by UI
+            }
+        })
+      }
+    }
+    else 
+    {
+      return res.status(404).send("No Membership Fee");
+    }
+  })
+})
 
 module.exports = router;

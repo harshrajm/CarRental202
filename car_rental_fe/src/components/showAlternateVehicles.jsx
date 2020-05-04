@@ -13,6 +13,7 @@ class ShowAlternateVehicles extends Component {
     const { data: vehicles } = await getAlternateVehicles(
       qs.stringify(this.props.alternate)
     );
+
     this.setState({ vehicles });
   }
 

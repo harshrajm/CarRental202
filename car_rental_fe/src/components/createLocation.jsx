@@ -89,7 +89,7 @@ class CreateLocation extends Component {
             className="btn btn-primary"
             onClick={this.handleCreate}
           >
-            Create Location
+            Add Location
           </button>
         </form>
       </React.Fragment>
