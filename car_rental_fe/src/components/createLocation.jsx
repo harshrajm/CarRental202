@@ -59,7 +59,7 @@ class CreateLocation extends Component {
             <label>Vehicle Capacity</label>
             <input type="Number" className="form-control" placeholder="Vehicle Capacity" onKeyUp={this.handleInputChange} name="vehicleCapacity"/>
           </div>
-          <button type="submit" className="btn btn-primary" onClick={this.handleCreate}>Create</button>
+          <button type="submit" className="btn btn-primary" onClick={this.handleCreate}>Create Location</button>
         </form>
         
         
