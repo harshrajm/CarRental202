@@ -66,7 +66,7 @@ export default class ManageLocation extends Component {
           </tbody>
         </table>
 
-        <Link to="/createlocation">+ Create</Link>
+        <Link to="/createlocation">+ create</Link>
       </div>
     )
   }
