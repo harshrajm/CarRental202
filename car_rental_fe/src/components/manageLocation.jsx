@@ -51,7 +51,6 @@ export default class ManageLocation extends Component {
     return (
       <div>
         <h3>Manage Locations</h3>
-        <Link to="/createlocation">+ Create</Link>
 
         <table className="table">
           <thead className="thead-light">
@@ -66,6 +65,8 @@ export default class ManageLocation extends Component {
             { this.locationList() }
           </tbody>
         </table>
+
+        <Link to="/createlocation">+ Create</Link>
       </div>
     )
   }
