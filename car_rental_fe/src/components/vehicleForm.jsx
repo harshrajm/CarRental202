@@ -54,7 +54,8 @@ class VehicleForm extends Component {
     try {
       alert("handle submit");
       const resp = await addVehicle(data);
-      window.location = "/admin/vehicle/";
+      this.props.onReload();
+      this.props.history.replace("/admin/vehicle");
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");

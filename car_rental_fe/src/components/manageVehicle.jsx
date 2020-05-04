@@ -11,16 +11,32 @@ class ManageVehicle extends Component {
     const { data: vehicles } = await getVehicles();
     this.setState({ vehicles });
   }
+
+  handleReload = async () => {
+    const { data: vehicles } = await getVehicles();
+    this.setState({ vehicles });
+  };
+
   render() {
     const { vehicles } = this.state;
     return (
       <React.Fragment>
         <Switch>
-          <Route path="/admin/vehicle/add" component={VehicleForm} />
+          {/* <Route
+            path="/admin/vehicle/add"
+            component={VehicleForm}
+            
+          /> */}
+          <Route
+            path="/admin/vehicle/add"
+            render={(props, vehicles) => (
+              <VehicleForm {...props} onReload={this.handleReload} />
+            )}
+          />
           <Route
             path="/admin/vehicle/"
-            render={vehicles => (
-              <VehiclesTable vehicles={this.state.vehicles} />
+            render={(props, vehicles) => (
+              <VehiclesTable {...props} vehicles={this.state.vehicles} />
             )}
           />
         </Switch>
