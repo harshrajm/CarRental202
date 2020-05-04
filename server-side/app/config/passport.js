@@ -206,8 +206,14 @@ var l = new LocationDetails({
     })
   });
 
-
+  var l3 = new LocationDetails({
+    "name": "UNASSIGNED",
+    "address": "None",
+    "vehicleCapacity": 1000
+    });
   var m=new MiscDetails({id:1,membershipFee : 100});
-  m.save();
+  l3.save().then(()=> {
+    m.save();
+  })
 module.exports = { passport, UserDetails, User, VehicleDetails, vehicle, BookingDetails, booking, LocationDetails, location, MiscDetails};
 

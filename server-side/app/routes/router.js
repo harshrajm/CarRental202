@@ -509,7 +509,6 @@ router.post('/register', (req, res) => {
   router.get('/locations', (req, res) => {
     locationDetails.find({}).then((obj) => {
       if (obj){
-        
         return res.send(obj);
       } else {
         return res.status(404).send("No locations exist");
@@ -1122,7 +1121,7 @@ router.get('/suggest/vehicles', async (req,res) => {
   var booking_query = {};
   var numberOfHours = 0;
   if (req.query.location){
-      query.location = { $ne: req.query.location };
+      query.location = { $nin: [req.query.location, "UNASSIGNED"] };
   }
   if (req.query.type){
       query.type = req.query.type;
