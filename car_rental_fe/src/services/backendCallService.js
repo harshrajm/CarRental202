@@ -40,3 +40,7 @@ export function getUserList() {
 export function getAlternateVehicles(queryString) {
   return http.get(apiUrl + "/suggest/vehicles?" + queryString);
 }
+
+export function addVehicle(data) {
+  return http.post(apiUrl + "/vehicle", data);
+}
