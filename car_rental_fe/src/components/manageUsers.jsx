@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { getUserList } from "../services/backendCallService";
-import axios from "axios";
+import { getUserList, deleteUser } from "../services/backendCallService";
+import { toast } from "react-toastify";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 export default class ManageUsers extends Component {
   state = { user: [] };
@@ -8,19 +9,19 @@ export default class ManageUsers extends Component {
   async componentDidMount() {
     const { data: user } = await getUserList();
     this.setState({ user });
-
-    this.deleteUser = this.deleteUser.bind(this);
   }
 
-  deleteUser(id) {
-    axios.delete("http://localhost:8080/admin/user" + id).then(response => {
-      console.log(response.data);
-    });
-
-    this.setState({
-      item: this.state.user.filter(el => el._id !== id)
-    });
-  }
+  handleDelete = async email => {
+    alert("to delete " + email);
+    const data = {};
+    data["email"] = email;
+    try {
+      //await deleteUser(data);
+      toast.success("user deleted");
+    } catch (ex) {
+      toast.error("Error deleting user");
+    }
+  };
 
   getUsersList() {
     if (this.state.user) {
@@ -29,16 +30,20 @@ export default class ManageUsers extends Component {
           <td>{item.name}</td>
           <td>{item.username}</td>
           <td>{item.email}</td>
-          <td>{item.membershipActive.toString()}</td>
           <td>
-            <a
-              href="#"
-              onClick={() => {
-                item.deleteUser(item._id);
-              }}
+            {item.membershipActive ? (
+              <span class="badge badge-success">Active</span>
+            ) : (
+              <span class="badge badge-danger">Inactive</span>
+            )}
+          </td>
+          <td>
+            <button
+              onClick={() => this.handleDelete(item.email)}
+              className="btn btn-link"
             >
-              Terminate
-            </a>
+              <RiDeleteBin6Line />
+            </button>
           </td>
         </tr>
       ));
@@ -48,14 +53,15 @@ export default class ManageUsers extends Component {
   render() {
     return (
       <div>
-        <h3>Manage Users</h3>
-        <table className="table">
-          <thead className="thead-light">
+        <h2>Manage Users</h2>
+        <table className="table ">
+          <thead>
             <tr>
               <th>Name</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Membership Active</th>
+              <th>Membership</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>{this.getUsersList()}</tbody>

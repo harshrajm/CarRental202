@@ -12,7 +12,7 @@ class VehiclesTable extends Component {
           <BsPlus /> Add Vehicle
         </Link>
         <h2>Manage Vehicles</h2>
-        <table className="table text-center">
+        <table className="table ">
           <thead>
             <tr>
               <th scope="col">Reg. Number</th>

@@ -47,3 +47,8 @@ export function addVehicle(data) {
 export function editVehicle(data, registrationTag) {
   return http.put(apiUrl + "/vehicle?registrationTag=" + registrationTag, data);
 }
+
+export function deleteUser(data) {
+  console.log("in deleteUser " + apiUrl + "/user");
+  return http.delete(apiUrl + "/user", data);
+}
