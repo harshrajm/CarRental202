@@ -152,29 +152,36 @@ router.post('/register', (req, res) => {
   endpoint : /user
   request type : DELETE
   query parameters : none
-  body : email
+  body : none
   return : 200 user deleted
            status 500 user delete failed
            status 404 user not found 
   */
-  router.delete('/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
+  router.delete('/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Customer),
   (req, res) => {
         //delete the user
         //TODO cancel his reservations also
-        console.log(163,req.body)
-        UserDetails.findOne({email: req.body.email}).then((user) => {
+        //console.log(163,req.body)
+        UserDetails.findOne({email: req.user.email}).then((user) => {
           if (user){
-            UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
-              if (obj.ok != 1){
-                console.log("Object delete error");
-                console.log(err);
-                res.status(500).send('User delete failed');
+            //Check active bookings
+            bookingDetails.find({$query: {email: req.user.email, isActive: 1}}).then((b)=> {
+              if (Array.isArray(b) && (b.length == 0)) {
+                UserDetails.deleteOne({email: req.user.email}).then((obj)=> {
+                  if (obj.ok != 1){
+                    console.log("Object delete error");
+                    console.log(err);
+                    res.status(500).send('User delete failed');
+                  } else {
+                    res.send('User deleted');
+                    //user should be redirected by UI
+                  }
+                }
+                );
               } else {
-                res.send('User deleted');
-                //user should be redirected by UI
+                res.status(400).send("This user has active bookings");
               }
-            }
-            );
+            })
           } else {
             res.status(404).send('User not found');
           }
@@ -195,20 +202,45 @@ router.post('/register', (req, res) => {
   (req, res) => {
         //delete the user
         //TODO cancel his reservations also
-        console.log(163,req.body)
         UserDetails.findOne({email: req.body.email}).then((user) => {
           if (user){
-            UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
-              if (obj.ok != 1){
-                console.log("Object delete error");
-                console.log(err);
-                res.status(500).send('User delete failed');
+            //First delete his bookings
+            bookingDetails.find({$query: {email: req.body.email, isActive: true}}).then((b)=> {
+              if (Array.isArray(b) && (b.length == 0)) {
+                //console.log("No active bookings ")
+                //console.log(b);
+                UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
+                  if (obj.ok != 1){
+                    console.log("Object delete error");
+                    console.log(err);
+                    res.status(500).send('User delete failed');
+                  } else {
+                    res.send('User deleted');
+                    //user should be redirected by UI
+                  }
+                }
+                );
               } else {
-                res.send('User deleted');
-                //user should be redirected by UI
+                //console.log("Active bookings");
+                for (var booking of b){
+                  //console.log(b);
+                  booking.isActive = false;
+                  booking.save();
+                }
+                UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
+                  if (obj.ok != 1){
+                    console.log("Object delete error");
+                    console.log(err);
+                    res.status(500).send('User delete failed');
+                  } else {
+                    res.send('User deleted');
+                    //user should be redirected by UI
+                  }
+                }
+                );
               }
-            }
-            );
+              
+            }); 
           } else {
             res.status(404).send('User not found');
           }
