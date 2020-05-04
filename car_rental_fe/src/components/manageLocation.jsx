@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaEdit } from "react-icons/fa";
 import { BsPlus } from "react-icons/bs";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const Location = props => (
   <tr>
@@ -10,7 +11,7 @@ const Location = props => (
     <td>{props.location.address}</td>
     <td>{props.location.vehicleCapacity}</td>
     <td>
-      <Link to={"/edit/" + props.location.name}><FaEdit /></Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}>delete</a>
+      <Link to={"/edit/" + props.location.name}><FaEdit /></Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}><RiDeleteBin6Line /></a>
     </td>
   </tr>
 )
