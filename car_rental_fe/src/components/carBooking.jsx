@@ -76,8 +76,8 @@ class CarBooking extends Component {
     return (
       <React.Fragment>
         <React.Fragment>
-          <div className="row m-3">
-            <div className="col-3">
+          <div className="row m-3 text-center">
+            <div className="col-3 ">
               <span className="badge badge-light">Location</span>
               <br />
               {this.state.searchParam.location}

@@ -12,6 +12,7 @@ const User = require('../models/user');
 const vehicle = require('../models/vehicle');
 var booking = require('../models/booking');
 var location = require('../models/location');
+var misc = require('../models/misc');
 
 passport.initialize();
 
@@ -27,6 +28,8 @@ const UserDetails = mongoose.model('userInfo', User.UserSchema, 'userInfo');
 const VehicleDetails = mongoose.model('vehicleInfo', vehicle, 'vehicleInfo');
 const BookingDetails = mongoose.model('bookingInfo', booking, 'bookingInfo');
 const LocationDetails = mongoose.model('locationInfo', location, 'locationInfo');
+const MiscDetails = mongoose.model('miscInfo', misc, 'miscInfo');
+
 
 /* PASSPORT LOCAL AUTHENTICATION */
 
@@ -203,5 +206,8 @@ var l = new LocationDetails({
     })
   });
 
-module.exports = { passport, UserDetails, User, VehicleDetails, vehicle, BookingDetails, booking, LocationDetails, location};
+
+  var m=new MiscDetails({id:1,membershipFee : 100});
+  m.save();
+module.exports = { passport, UserDetails, User, VehicleDetails, vehicle, BookingDetails, booking, LocationDetails, location, MiscDetails};
 

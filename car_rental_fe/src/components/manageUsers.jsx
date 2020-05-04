@@ -50,9 +50,9 @@ export default class ManageUsers extends Component {
   render() {
     return (
       <div>
-        <h3>Manage Users</h3>
-        <table className="table">
-          <thead className="thead-light">
+        <h2>Manage Users</h2>
+        <table className="table ">
+          <thead>
             <tr>
               <th>Name</th>
               <th>Username</th>
@@ -66,6 +66,6 @@ export default class ManageUsers extends Component {
           </tbody>
         </table>
       </div>
-    )
+    );
   }
 }

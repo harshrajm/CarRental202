@@ -10,7 +10,7 @@ var bookingDetails = require('../config/passport').BookingDetails;
 var locationDetails = require('../config/passport').LocationDetails;
 var booking = require('../config/passport').booking;
 var location = require('../config/passport').location;
-
+var membershipDetails = require('../config/passport').MiscDetails;
 const jwt = require('jsonwebtoken');
 const keys = 'secret';
 const moment = require('moment-timezone');
@@ -1255,5 +1255,17 @@ function convertVehicle(v){
   v._doc = {...v._doc, ...lastService}
   return v;
 }
+
+router.get('/membershipFee', passport.authenticate('jwt', {session: false}), (req, res) => {
+  membershipDetails.find({}).then((obj) => {
+    if (obj){
+      
+      return res.send(obj);
+    } else {
+      return res.status(404).send("No Membership Fee");
+    }
+  });
+});
+
 
 module.exports = router;

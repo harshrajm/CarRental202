@@ -25,7 +25,8 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
     "react-select-us-states": "^0.1.2",
-    "react-toastify": "^5.5.0"
+    "react-toastify": "^5.5.0",
+    "react-year-picker": "^0.3.7"
   },
   "scripts": {
     "start": "node ./node_modules/react-scripts/bin/react-scripts.js start",
