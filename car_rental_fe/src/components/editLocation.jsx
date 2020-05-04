@@ -45,7 +45,7 @@ export default class EditLocation extends Component {
     console.log(this.state);
     e.preventDefault();
     var data = await updateLocation(this.state);
-    alert(data.data);
+    //alert(data.data);
     this.setState({ redirect: true });
   };
 

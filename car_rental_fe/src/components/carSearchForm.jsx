@@ -113,7 +113,8 @@ class CarSearchForm extends Component {
       if (vehicles.length > 0) {
         this.props.onVehiclesUpdate(vehicles, data);
       } else {
-        alert("no vehicles");
+        toast.error("No vehicles");
+        //alert("no vehicles");
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {

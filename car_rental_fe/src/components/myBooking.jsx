@@ -9,6 +9,7 @@ import Modal from "react-modal";
 import moment from "moment";
 import Rating from "react-rating";
 import qs from "query-string";
+import { toast } from "react-toastify";
 
 class MyBooking extends Component {
   state = {
@@ -51,6 +52,7 @@ class MyBooking extends Component {
       //const { data: bookings } = await getBookings();
       //this.setState({ bookings });
       await this.loadBookings();
+      toast.success("Booking cancelled");
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");
@@ -84,6 +86,7 @@ class MyBooking extends Component {
       //const { data: bookings } = await getBookings();
       await this.loadBookings();
       this.setState({ showModal: false });
+      toast.success("Trip Ended!");
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");

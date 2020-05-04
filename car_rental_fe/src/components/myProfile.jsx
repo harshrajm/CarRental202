@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { getUser, extendMembership } from "../services/backendCallService";
 import moment from "moment";
+import { toast } from "react-toastify";
 
 class MyProfile extends Component {
   state = { user: {} };
@@ -14,6 +15,7 @@ class MyProfile extends Component {
     await extendMembership();
     const { data: user } = await getUser();
     this.setState({ user });
+    toast.success("Membership extended");
   };
 
   render() {
