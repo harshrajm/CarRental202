@@ -14,6 +14,8 @@ import AdminDashboard from "./components/admin";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ViewAllVehicles from "./components/viewAllVehicles";
+import EditLocation from "./components/editLocation";
+import CreateLocation from "./components/createLocation";
 
 class App extends Component {
   state = {};
@@ -56,6 +58,12 @@ class App extends Component {
               path="/admin"
               render={props => <AdminDashboard {...props} user={user} />}
             />
+            <Route
+              path="/createlocation"
+              render={props => <CreateLocation {...props} user={user} />}
+            />
+
+            <Route path="/edit/:name" component={EditLocation} />
 
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" exact to="/book" />

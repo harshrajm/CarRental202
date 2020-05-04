@@ -8,7 +8,7 @@ const Location = props => (
     <td>{props.location.address}</td>
     <td>{props.location.vehicleCapacity}</td>
     <td>
-      <Link to={"/edit/" + props.location._id}>edit</Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}>delete</a>
+      <Link to={"/edit/" + props.location.name}>edit</Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}>delete</a>
     </td>
   </tr>
 )
@@ -51,6 +51,8 @@ export default class ManageLocation extends Component {
     return (
       <div>
         <h3>Manage Locations</h3>
+        <Link to="/createlocation">+ Create</Link>
+
         <table className="table">
           <thead className="thead-light">
             <tr>

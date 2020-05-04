@@ -5,6 +5,19 @@ export function getLocation() {
   return http.get(apiUrl + "/locations");
 }
 
+export function postNewLocation(body) {
+  return http.post(apiUrl + "/location",body);
+}
+export function getLocationOne(queryString) {
+  return http.get(apiUrl + "/locationone?" + queryString);
+}
+export function updateLocation(body) {
+  return http.post(apiUrl + "/updateLocation",body);
+}
+export function deleteOneUser(body) {
+  return http.post(apiUrl + "/user_delete",body);
+}
+
 export function getVehicles(queryString) {
   return http.get(apiUrl + "/vehicles?" + queryString);
 }

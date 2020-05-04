@@ -1,112 +1,72 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import qs from "query-string";
+import { Redirect } from "react-router-dom";
+
+import {getLocationOne,updateLocation} from "../services/backendCallService";
 
 export default class EditLocation extends Component {
   constructor(props) {
     super(props);
-
-    this.onChangeName = this.onChangeName.bind(this);
-    this.onChangeAddress = this.onChangeAddress.bind(this);
-    this.onChangevehicleCapacity = this.onChangevehicleCapacity.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
 
     this.state = {
       name: '',
       address: '',
-      vehicleCapacity: 0,
+      vehicleCapacity: '',
+      redirect:false
     }
   }
 
-  componentDidMount() {
-    axios.get('http://localhost:8080/locations/'+this.props.match.params.loc)
-      .then(response => {
-        this.setState({
-          name: response.data.name,
-          address: response.data.address,
-          vehicleCapacity: response.data.vehicleCapacity,
-        })   
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-
-    axios.get('http://localhost:8080/location/')
-      .then(response => {
-        if (response.data.length > 0) {
-          this.setState({
-            location: response.data.map(location => item.name),
-          })
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-
+  async componentDidMount() {
+    var q = {name:this.props.match.params.name};
+    const data = await getLocationOne(qs.stringify(q));
+    console.log(data);
+    this.setState({ name:data.data.name});
+    this.setState({ address:(data.data.address === undefined ? '': data.data.address)});
+    this.setState({ vehicleCapacity:data.data.vehicleCapacity});
+    this.setState({ _id:data.data._id});
+    console.log(this.state)
   }
 
-  onChangeName(e) {
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.value ;
+    const name = target.name;
     this.setState({
-      name: e.target.value
-    })
+      [name]: value    
+    });
   }
 
-  onChangeAddress(e) {
-    this.setState({
-      address: e.target.value
-    })
-  }
-
-  onChangevehicleCapacity(e) {
-    this.setState({
-      vehicleCapacity: e.target.value
-    })
-  }
-
-  onSubmit(e) {
+  onSubmit = async e => {
+    console.log(this.state)
     e.preventDefault();
-
-    const location = {
-      name: this.state.name,
-      address: this.state.address,
-      vehicleCapacity: this.state.vehicleCapacity,
-    }
-
-    console.log(location);
-
-    axios.post('http://localhost:8080/location' + this.props.match.params.id, location)
-      .then(res => console.log(res.data));
-
-    window.location = '/';
+    var data = await updateLocation(this.state);
+    alert(data.data);
+    this.setState({redirect:true})
   }
 
   render() {
     return (
     <div>
+    {this.state.redirect ? <Redirect to="/admin/location"  /> : ''}
       <h3>Edit Location</h3>
       <form onSubmit={this.onSubmit}>
         <div className="form-group"> 
           <label>Name: </label>
-          <select ref="userInput"
+          <input type="text"
               required
               className="form-control"
-              value={this.state.name}
-              onChange={this.onChangeName}>
-              {
-                this.state.location.map(function(item) {
-                  return <option 
-                    key={item}
-                    value={item}>{item}
-                    </option>;
-                })
-              }
-          </select>
+              defaultValue={this.state.name}
+              onKeyUp={this.handleInputChange} name="name"/>
         </div>
         <div className="form-group"> 
           <label>Address: </label>
           <input  type="text"
               required
               className="form-control"
-              value={this.state.address}
-              onChange={this.onChangeAddress}
+              defaultValue={this.state.address}
+              onKeyUp={this.handleInputChange} name="address"
               />
         </div>
         <div className="form-group">
@@ -114,8 +74,8 @@ export default class EditLocation extends Component {
           <input 
               type="text" 
               className="form-control"
-              value={this.state.vehicleCapacity}
-              onChange={this.onChangevehicleCapacity}
+              defaultValue={this.state.vehicleCapacity}
+              onKeyUp={this.handleInputChange} name="vehicleCapacity"
               />
         </div>
 

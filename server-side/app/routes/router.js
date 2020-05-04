@@ -156,11 +156,12 @@ router.post('/register', (req, res) => {
            status 500 user delete failed
            status 404 user not found 
   */
-  router.delete('/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Customer),
+  router.delete('/user', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req, res) => {
         //delete the user
         //TODO cancel his reservations also
-        UserDetails.findOne({email: req.user.email}).then((user) => {
+        console.log(163,req.body)
+        UserDetails.findOne({email: req.body.email}).then((user) => {
           if (user){
             UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
               if (obj.ok != 1){
@@ -178,6 +179,41 @@ router.post('/register', (req, res) => {
           }
         })
   });
+
+
+  /*
+  endpoint : /user
+  request type : POST
+  query parameters : none
+  body : email
+  return : 200 user deleted
+           status 500 user delete failed
+           status 404 user not found 
+  */
+  router.post('/user_delete', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
+  (req, res) => {
+        //delete the user
+        //TODO cancel his reservations also
+        console.log(163,req.body)
+        UserDetails.findOne({email: req.body.email}).then((user) => {
+          if (user){
+            UserDetails.deleteOne({email: req.body.email}).then((obj)=> {
+              if (obj.ok != 1){
+                console.log("Object delete error");
+                console.log(err);
+                res.status(500).send('User delete failed');
+              } else {
+                res.send('User deleted');
+                //user should be redirected by UI
+              }
+            }
+            );
+          } else {
+            res.status(404).send('User not found');
+          }
+        })
+  });
+
 
   /*
   endpoint : /user/membership
@@ -509,6 +545,46 @@ router.post('/register', (req, res) => {
     }
   });
 
+router.get('/locationone', passport.authenticate('jwt', {session: false}), (req,res) => {
+    if (!req.query.name) {
+      return res.status(400).send('Missing name field');
+    } else {
+      locationDetails.findOne({ name: req.query.name} ).then((obj)=>{
+        console.log(obj)
+        if (obj){
+          return res.send(obj);
+        } else {
+          return res.status(404).send("No cars");
+        }
+      });
+    }
+  });
+
+router.post('/updateLocation', passport.authenticate('jwt', {session: false}), (req,res) => {
+    var updateData = {
+      name:req.body.name,
+      address: req.body.address,
+      vehicleCapacity: req.body.vehicleCapacity,
+    }
+    console.log(req.body)
+    locationDetails.find({name:req.body.name},function(obj){
+      if(obj == null){
+        locationDetails.updateOne({ _id: req.body._id},updateData,function(err,result){
+          if(err){
+            return res.status(404).send("Not found");
+          }else{
+            return res.send("Successfully Saved!");
+          }
+
+        })
+      }else{
+        return res.send("Already Exists!");
+      }
+    });
+
+
+  });
+
 
   /*
   endpoint : /location
@@ -519,7 +595,7 @@ router.post('/register', (req, res) => {
             400 If location name already exists
   */
   //create a new location
-  router.post('/location', passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
+  router.post('/location', passport.authenticate('jwt', {session: false}),User.checkIsInRole(User.Roles.Admin),
   (req,res) => {
     //check if already exists
     //ISSUE
@@ -529,7 +605,7 @@ router.post('/register', (req, res) => {
       if (obj){
         return res.status(400).send("This location name already exists "+obj);
       } else {
-        l = new locationDetails({name: req.body.name, adress: req.body.address, vehicleCapacity: req.body.vehicleCapacity})
+        l = new locationDetails({name: req.body.name, address: req.body.address, vehicleCapacity: req.body.vehicleCapacity})
         l.save();
         return res.send("Location saved");
       }
@@ -618,7 +694,9 @@ router.post('/register', (req, res) => {
     } else {
       return res.status(400).send("name missing");
     }
-   })
+    })
+
+    
 
 
 
