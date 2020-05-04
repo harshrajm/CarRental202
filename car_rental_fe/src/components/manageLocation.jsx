@@ -14,7 +14,7 @@ const Location = props => (
       {props.location.name !== "UNASSIGNED" && (
         <React.Fragment>
           <Link className="btn btn-link" to={"/edit/" + props.location.name}>
-            edit{" "}
+            <FaEdit />{" "}
           </Link>
           <button
             href="#"
@@ -23,7 +23,7 @@ const Location = props => (
               props.deleteLocation(props.location.name);
             }}
           >
-            delete
+            <RiDeleteBin6Line />
           </button>
         </React.Fragment>
       )}
