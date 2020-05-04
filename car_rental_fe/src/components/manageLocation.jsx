@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Location = props => (
   <tr>
@@ -8,43 +8,68 @@ const Location = props => (
     <td>{props.location.address}</td>
     <td>{props.location.vehicleCapacity}</td>
     <td>
-      <Link to={"/edit/" + props.location.name}>edit</Link> | <a href="#" onClick={() => { props.deleteLocation(props.location.name) }}>delete</a>
+      {props.location.name !== "UNASSIGNED" && (
+        <React.Fragment>
+          <Link className="btn btn-link" to={"/edit/" + props.location.name}>
+            edit{" "}
+          </Link>
+          <button
+            href="#"
+            className="btn btn-link"
+            onClick={() => {
+              props.deleteLocation(props.location.name);
+            }}
+          >
+            delete
+          </button>
+        </React.Fragment>
+      )}
     </td>
   </tr>
-)
+);
 
 export default class ManageLocation extends Component {
   constructor(props) {
     super(props);
 
-    this.deleteLocation = this.deleteLocation.bind(this)
+    this.deleteLocation = this.deleteLocation.bind(this);
 
-    this.state = {location: []};
+    this.state = { location: [] };
   }
 
   componentDidMount() {
-    axios.get('http://localhost:8080/locations/')
+    axios
+      .get("http://localhost:8080/locations/")
       .then(response => {
-        this.setState({ location: response.data })
+        this.setState({ location: response.data });
       })
-      .catch((error) => {
+      .catch(error => {
         console.log(error);
-      })
+      });
   }
 
   deleteLocation(id) {
-    axios.delete('http://localhost:8080/location/?name='+id)
-      .then(response => { console.log(response.data)});
+    axios
+      .delete("http://localhost:8080/location/?name=" + id)
+      .then(response => {
+        console.log(response.data);
+      });
 
     this.setState({
       location: this.state.location.filter(el => el.name !== id)
-    })
+    });
   }
 
   locationList() {
     return this.state.location.map(item => {
-      return <Location location={item} deleteLocation={this.deleteLocation} key={item.name}/>;
-    })
+      return (
+        <Location
+          location={item}
+          deleteLocation={this.deleteLocation}
+          key={item.name}
+        />
+      );
+    });
   }
 
   render() {
@@ -61,13 +86,11 @@ export default class ManageLocation extends Component {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            { this.locationList() }
-          </tbody>
+          <tbody>{this.locationList()}</tbody>
         </table>
 
         <Link to="/createlocation">+ create</Link>
       </div>
-    )
+    );
   }
 }
