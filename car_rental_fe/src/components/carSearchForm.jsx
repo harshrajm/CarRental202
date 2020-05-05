@@ -18,31 +18,15 @@ class CarSearchForm extends Component {
         .toDate(),
       selectedLocation: ""
     },
-    locations: [
-      // {
-      //   _id: "5e95650dc764413c1e8b396c",
-      //   name: "San Jose",
-      //   address: "101 E San Fernando Street"
-      // },
-      // {
-      //   _id: "5e95650dc764413c1e8b396a",
-      //   name: "Santa Clara",
-      //   address: "Vista Montana"
-      // }
-    ]
+    locations: []
   };
 
   async componentDidMount() {
     let { data: locations } = await getLocation();
-    //console.log(locations);
     locations = locations.filter(l => l.name !== "UNASSIGNED");
     this.state.data.selectedLocation = locations[0].name;
     this.setState({
-      locations //: locations.map(each => ({
-      //   _id: each._id,
-      //   name: each.name,
-      //   address: each.address
-      // }))
+      locations
     });
   }
 
@@ -69,11 +53,8 @@ class CarSearchForm extends Component {
   };
 
   handleSubmit = async e => {
-    //toast.error("component did mount");
     e.preventDefault();
-    //console.log("form submitted!!", this.state.data);
 
-    //TO DO validate fields
     //1. check start date is valid
     if (!moment(this.state.data.startDate).isSameOrAfter(moment(new Date()))) {
       toast.error("Invalid start date");
@@ -107,14 +88,11 @@ class CarSearchForm extends Component {
       data["expectedCheckin"] = this.state.data.endDate;
       data["checkOut"] = this.state.data.startDate;
       data["location"] = this.state.data.selectedLocation;
-      //console.log("toBeSent", data);
       const { data: vehicles } = await getVehicles(qs.stringify(data));
-      console.log("vehicles", vehicles);
       if (vehicles.length > 0) {
         this.props.onVehiclesUpdate(vehicles, data);
       } else {
         toast.error("No vehicles");
-        //alert("no vehicles");
       }
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {

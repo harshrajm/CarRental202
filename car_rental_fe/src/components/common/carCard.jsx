@@ -46,7 +46,7 @@ class CarCard extends Component {
                     </h4>
 
                     <small className="float-right mt-2 font-weight-light">
-                      Estimate (Base rate + hourly rate) :
+                      Estimate (Base rate ${baseRate} + hourly rate) :
                     </small>
                   </React.Fragment>
                 )}

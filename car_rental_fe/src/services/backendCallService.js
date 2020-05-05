@@ -69,3 +69,7 @@ export function deleteUser(data) {
 export function deleteLocation(id) {
   return http.delete(apiUrl + "/location/?name=" + id);
 }
+
+export function getMembershipFee() {
+  return http.get(apiUrl + "/membershipFee");
+}

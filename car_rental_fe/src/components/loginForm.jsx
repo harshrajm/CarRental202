@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import auth from "../services/authService";
+import { toast } from "react-toastify";
 
 class LoginForm extends Component {
   state = {
@@ -27,9 +28,11 @@ class LoginForm extends Component {
       const { state } = this.props.location;
       window.location = state ? state.from.pathname : "/";
       //window.location = "/";
+      toast.success("Logged In!");
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         console.log("400 error");
+        toast.error("Invalid username or password");
       }
     }
   };

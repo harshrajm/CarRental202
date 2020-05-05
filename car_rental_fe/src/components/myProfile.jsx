@@ -1,13 +1,21 @@
 import React, { Component } from "react";
-import { getUser, extendMembership } from "../services/backendCallService";
+import {
+  getUser,
+  extendMembership,
+  getMembershipFee,
+  deleteUser
+} from "../services/backendCallService";
 import moment from "moment";
 import { toast } from "react-toastify";
+import auth from "../services/authService";
 
 class MyProfile extends Component {
   state = { user: {} };
+
   async componentDidMount() {
     const { data: user } = await getUser();
-    this.setState({ user });
+    const { data: membershipFee } = await getMembershipFee();
+    this.setState({ user, membershipFee: membershipFee[0].membershipFee });
   }
 
   handleExtend = async () => {
@@ -16,6 +24,19 @@ class MyProfile extends Component {
     const { data: user } = await getUser();
     this.setState({ user });
     toast.success("Membership extended");
+  };
+
+  handleDelete = async () => {
+    const data = { ...this.state.user };
+    //const email = this.state.user.email;
+    try {
+      await deleteUser(data);
+      toast.success("user deleted");
+      auth.logout();
+      window.location = "/";
+    } catch (ex) {
+      toast.error("You have active bookings");
+    }
   };
 
   render() {
@@ -58,23 +79,20 @@ class MyProfile extends Component {
                   {moment(membershipEndDate).format("ddd DD MMM YYYY, HH:mm")}
                 </p>
 
-                {membershipActive ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary float-right"
-                    onClick={this.handleExtend}
-                  >
-                    Extend membership + 6 months
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="btn btn-primary float-right"
-                    onClick={this.handleExtend}
-                  >
-                    Get 6 months membership
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="btn btn-primary float-right"
+                  onClick={this.handleExtend}
+                >
+                  Extend membership +6 months for ${this.state.membershipFee}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger float-right mr-2"
+                  onClick={this.handleDelete}
+                >
+                  Delete account
+                </button>
               </div>
             </div>
           </div>
