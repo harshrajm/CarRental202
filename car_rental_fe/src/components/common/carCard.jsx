@@ -22,7 +22,7 @@ class CarCard extends Component {
     } = this.props;
     return (
       <React.Fragment>
-        <div className="card m-4">
+        <div className="card m-4 shadow p-1">
           <div className="row ">
             <div className="col-md-4">
               <img

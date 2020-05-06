@@ -6,8 +6,15 @@ class NavBar extends Component {
     const { user } = this.props;
 
     return (
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light shadow">
         <Link className="navbar-brand" to="/">
+          <img
+            src="https://nextcarrental.com/smsite/npauto_3/media/imgs/21948_loader.gif"
+            width="30"
+            height="30"
+            class="d-inline-block align-top"
+            alt=""
+          />
           Car Rental
         </Link>
 
@@ -62,7 +69,7 @@ class NavBar extends Component {
             )}
 
             {user && (
-              <NavLink className="nav-item nav-link float-right" to="/logout">
+              <NavLink className="nav-item nav-link " to="/logout">
                 Logout
               </NavLink>
             )}

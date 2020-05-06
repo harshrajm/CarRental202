@@ -43,7 +43,7 @@ class LoginForm extends Component {
       <React.Fragment>
         <div className="row justify-content-center">
           <div className="col-4">
-            <div className="card addTopMargin">
+            <div className="card addTopMargin shadow">
               <div className="card-header">Login</div>
               <div className="card-body">
                 <form onSubmit={this.handleSubmit}>

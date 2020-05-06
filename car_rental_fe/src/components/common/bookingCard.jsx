@@ -20,7 +20,7 @@ class BookingCard extends Component {
     } = this.props.bookingsDtls;
 
     return (
-      <div className="card m-4">
+      <div className="card m-4 shadow p-1">
         <div className="row ">
           <div className="col-md-4 thumbnail text-center">
             <img

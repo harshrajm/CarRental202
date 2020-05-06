@@ -51,7 +51,7 @@ class MyProfile extends Component {
     return (
       <React.Fragment>
         <div className="justify-content-center row mt-5">
-          <div className="card w-75">
+          <div className="card w-75 shadow p-1">
             <div className="card-body row">
               <div className="col-4">
                 <img
