@@ -730,7 +730,42 @@ router.post('/updateLocation', passport.authenticate('jwt', {session: false}), (
 
     
 
+  /*
+  endpoint : /admin/activebookings
+  request type : GET
+  query paramaters : none
+  request body : none
+  return 200 returns all active bookings in the system
+  */
+ router.get('/admin/activebookings', passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
+ (req,res) => {
+   bookingDetails.find({ isActive: true }).then((bookings) => {
+    var updated_bookings = []
+    for (var booking of bookings){
+      updated_bookings.push(convertBookingDate(booking));
+    }
+    return res.send(updated_bookings);
+   })
+ })
 
+
+ /*
+  endpoint : /admin/completedbookings
+  request type : GET
+  query paramaters : none
+  request body : none
+  return 200 returns all completed bookings in the system
+  */
+ router.get('/admin/completedbookings', passport.authenticate('jwt', {session: false}), User.checkIsInRole(User.Roles.Admin),
+ (req,res) => {
+   bookingDetails.find({ isActive: false }).then((bookings) => {
+    var updated_bookings = []
+    for (var booking of bookings){
+      updated_bookings.push(convertBookingDate(booking));
+    }
+    return res.send(updated_bookings);
+   })
+ })
 
   /*
   endpoint : /bookings
@@ -1347,5 +1382,8 @@ router.post('/feechange', passport.authenticate('jwt', {session: false}),
     }
   })
 })
+
+//Ping endpoint
+router.get('/ping', (req, res) => { return res.send('ok'); })
 
 module.exports = router;

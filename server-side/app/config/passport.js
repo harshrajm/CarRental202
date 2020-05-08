@@ -1,7 +1,7 @@
 const db_user = process.env.DB_USER || '';
 const db_password = process.env.DB_PASSWORD || '';
-const db_connect_string = process.env.DB_CONNECT || 'localhost:27017/cmpe202';
-
+//const db_connect_string = process.env.DB_CONNECT || 'localhost:27017/cmpe202';
+const db_connect_string = 'cmpe202:cmpe202Welcome_123@cluster0-hrvoe.mongodb.net/cmpe202';
 
 /*  PASSPORT SETUP  */
 const passport = require('passport');
@@ -20,7 +20,7 @@ passport.initialize();
 var mongoose   = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 //'+db_user+':'+db_password+'@'
-mongoose.connect('mongodb://'+db_connect_string, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb+srv://'+db_connect_string, { useNewUrlParser: true, useUnifiedTopology: true });
 
 //console.log(User);
 User.UserSchema.plugin(passportLocalMongoose);
