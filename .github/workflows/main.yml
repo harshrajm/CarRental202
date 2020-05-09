@@ -1,0 +1,15 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run multiline command
+      env:
+        HEROKU_API_TOKEN: "f6434718-51e5-4a83-9924-d633f1fe87b5"
+        HEROKU_APP_NAME: "cmpe202-car-rental" 
+      run: git subtree push --prefix car_rental_fe/ https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git master
