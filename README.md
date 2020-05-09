@@ -27,6 +27,7 @@
 ![User login](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/user_login.png)
 ![User Register](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/user_register.png)
 ![User car search](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/user_car_search.png)
+![User car browse](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/user_car_browse.png)
 ![User car booking](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/user_bookings.png)
 ![User profile](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/user_profile.png)
 
