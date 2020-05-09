@@ -33,6 +33,7 @@ class ViewAllVehicles extends Component {
             hourlyRate={v.hourlyRate}
             registrationTag={v.registrationTag}
             allowSelectAction={false}
+            condition={v.condition}
           />
         ))}
       </React.Fragment>

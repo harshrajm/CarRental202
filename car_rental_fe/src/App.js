@@ -16,6 +16,8 @@ import { ToastContainer } from "react-toastify";
 import ViewAllVehicles from "./components/viewAllVehicles";
 import EditLocation from "./components/editLocation";
 import CreateLocation from "./components/createLocation";
+import ActiveBookings from "./components/activeBookings";
+import CompletedBookings from "./components/completedBookings";
 
 class App extends Component {
   state = {};
@@ -69,6 +71,18 @@ class App extends Component {
               <Route
                 path="/admin"
                 render={props => <AdminDashboard {...props} user={user} />}
+              />
+            )}
+            {user && user.isAdmin && (
+              <Route
+                path="/adminBookings/active"
+                render={props => <ActiveBookings {...props} user={user} />}
+              />
+            )}
+            {user && user.isAdmin && (
+              <Route
+                path="/adminBookings/completed"
+                render={props => <CompletedBookings {...props} user={user} />}
               />
             )}
             {/* <Route
