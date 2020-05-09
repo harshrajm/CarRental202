@@ -73,3 +73,7 @@ export function deleteLocation(id) {
 export function getMembershipFee() {
   return http.get(apiUrl + "/membershipFee");
 }
+
+export function updateMembershipfee(body) {
+  return http.post(apiUrl + "/feechange", body);
+}

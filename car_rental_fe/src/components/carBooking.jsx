@@ -136,6 +136,7 @@ class CarBooking extends Component {
             registrationTag={v.registrationTag}
             allowSelectAction={true}
             onShowAlternateClick={this.handleShowAlternateClick}
+            condition={v.condition}
           />
         ))}
         {/* <CarCard /> */}
