@@ -40,6 +40,19 @@ class NavBar extends Component {
               </NavLink>
             )}
             {user && user.isAdmin && (
+              <NavLink className="nav-item nav-link" to="/adminBookings/active">
+                Active Bookings
+              </NavLink>
+            )}
+            {user && user.isAdmin && (
+              <NavLink
+                className="nav-item nav-link"
+                to="/adminBookings/completed"
+              >
+                Completed Bookings
+              </NavLink>
+            )}
+            {user && user.isAdmin && (
               <NavLink className="nav-item nav-link" to="/viewAllVehicles">
                 View All Vehicles
               </NavLink>

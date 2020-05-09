@@ -78,15 +78,13 @@ class CarCard extends Component {
                     </small>
                   </React.Fragment>
                 )}
-
                 <h3 className="card-title">{manu + " " + name}</h3>
-
                 <hr />
-                {/* <span className="badge badge-light m-1">
-                  Condition : {condition}
-                </span> */}
-                <span className="badge badge-info m-1">{type}</span>
-
+                <span className="badge badge-info m-1">{type}</span> |
+                <span className="text-muted">
+                  <span className="badge badge-light m-1">Condition</span>{" "}
+                  {condition}
+                </span>
                 <p className="card-text float-right">
                   <MdLocationOn />
                   {location}
@@ -101,7 +99,6 @@ class CarCard extends Component {
                     NOT AVAILABLE
                   </h3>
                 )}
-
                 {allowSelectAction && isAvailable && (
                   <button
                     type="button"
@@ -111,7 +108,6 @@ class CarCard extends Component {
                     Book
                   </button>
                 )}
-
                 {allowSelectAction && !isAvailable && (
                   <button
                     type="button"

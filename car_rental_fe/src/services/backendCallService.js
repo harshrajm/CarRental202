@@ -77,3 +77,11 @@ export function getMembershipFee() {
 export function updateMembershipfee(body) {
   return http.post(apiUrl + "/feechange", body);
 }
+
+export function getAllActiveBookings() {
+  return http.get(apiUrl + "/admin/activebookings");
+}
+
+export function getAllCompletedBookings() {
+  return http.get(apiUrl + "/admin/completedbookings");
+}
