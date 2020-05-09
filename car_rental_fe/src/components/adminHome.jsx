@@ -46,10 +46,10 @@ class AdminHome extends Component {
         <h2>Admin Home</h2>
         <hr />
         <div className="row">
-          <div className="col">
+          {/* <div className="col">
             <small>Total Bookings</small>
             <h3>todo</h3>
-          </div>
+          </div> */}
           <div className="col">
             <small>Total users</small>
             <h3>{this.state.userLen}</h3>
