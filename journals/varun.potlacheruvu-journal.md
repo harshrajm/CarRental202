@@ -3,6 +3,41 @@ What tasks did I work on / complete?
 What am I planning to work on next?
 What tasks are blocked waiting on another team member?
 
+5/05/2020
+---------
+Website completed
+
+Check if all tasks are completed and uploaded
+Prepare for presentation
+
+No blockers
+
+4/28/2020
+---------
+Admin dashboard completed
+
+Work on diagrams and presentation
+Test the product thoroughly
+
+No blockers
+
+4/21/2020
+---------
+Finshed Manage Locations
+
+Work on Create and Edit Locations
+
+No blockers
+
+
+4/14/2020
+---------
+Finished Manage Users
+
+Work on Manage Locations
+
+No blockers
+
 4/07/2020
 ---------
 Designed the UI wirefrmaes in Adobe XD
