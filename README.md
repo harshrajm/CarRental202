@@ -37,6 +37,9 @@
 ## Journals
 [Journal link](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/tree/master/journals)
 
+## Backend API Documentation
+[API doc](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/server-side/README.md)
+
 ## Sprint Task Sheet
 [Sprint task sheet link](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/burndown%20chart/CMPE%20202%20Sprint%20Task%20Sheet-FirmwareRebels.xlsx)
 
