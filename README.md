@@ -11,7 +11,6 @@
 - Harshraj
 - Varun
 
-## UI Wireframes
 
 ## Use case diagram
 
@@ -34,3 +33,6 @@
 ### Admin Module
 ![Admin 1](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/admin_1.png)
 ![Admin 2](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/admin_2.png)
+
+## Burndown chart
+![Burndown chart](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/burndown%20chart/Screenshot%202020-05-09%20at%2011.00.57%20AM.png)
