@@ -13,8 +13,10 @@
 
 ## UI Wireframes
 
-## Use case diagam
+## Use case diagram
+
+![Use case diagram](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/diagrams/Use Case.jpg "Use case Diagram")
 
 ## Architecture
 
-![Architecture diagram](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/Deployment.jpg "Architecture Diagram")
+![Architecture diagram](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/diagrams/Deployment.jpg "Architecture Diagram")
