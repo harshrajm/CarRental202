@@ -28,7 +28,7 @@ class CarCard extends Component {
       <React.Fragment>
         <div className="card m-4 shadow p-1">
           <div className="row ">
-            <div className="col-md-4 thumbnail text-center">
+            <div className="col-md-4 ">
               <img
                 src={imgUrl} //"https://media.ed.edmunds-media.com/tesla/model-s/2018/oem/2018_tesla_model-s_sedan_p100d_rq_oem_4_815.jpg"
                 className="card-img"
@@ -36,9 +36,9 @@ class CarCard extends Component {
                 height="180px"
                 alt="car"
               />
-              <div className="imgBadge">
+              {/* <div className="imgBadge">
                 <span className="badge badge-secondary">{condition}</span>
-              </div>
+              </div> */}
             </div>
             <div className="col-md-8 ">
               <div className="card-block p-3">
@@ -82,8 +82,10 @@ class CarCard extends Component {
                 <hr />
                 <span className="badge badge-info m-1">{type}</span> |
                 <span className="text-muted">
-                  <span className="badge badge-light m-1">Condition</span>{" "}
-                  {condition}
+                  <span className="badge badge-light m-1">
+                    <strong>Condition</strong>
+                    {" : " + condition}
+                  </span>
                 </span>
                 <p className="card-text float-right">
                   <MdLocationOn />

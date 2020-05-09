@@ -14,7 +14,9 @@ class RegisterForm extends Component {
       creditCardNameonCard: "ambani",
       creditCardCVV: "",
       licenseState: "California",
-      licenseNumber: ""
+      licenseNumber: "",
+      profilePictureURL:
+        "https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80"
     }
   };
 
