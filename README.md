@@ -7,9 +7,14 @@
 ## Team Members: 
 
 - Vijayashree
-- Joseph
+- Jojo Joseph
 - Harshraj
 - Varun
 
 ## UI Wireframes
 
+## Use case diagam
+
+## Architecture
+
+![Architecture diagram](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/Deployment.jpg "Architecture Diagram")
