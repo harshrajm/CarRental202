@@ -71,6 +71,7 @@ No blockers
 Communicated the tasks to be done clearly to other team members. Had productive and open discussion in scrum meetings.
 
 # XP Core Values
-Communication
+Feedback
 
-Made sure the communication during scrum meetings is clear and open. Facilitated an environment encouraging discussions and feedback.
+Made sure to show my work to the team weekly and attain feedback. 
+With the help of this feedback I was able to prioratize my tasks, this led to a seamless integration of fronend and backend application.
