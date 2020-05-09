@@ -3,6 +3,10 @@ What tasks did I work on / complete?
 What am I planning to work on next?
 What tasks are blocked waiting on another team member?
 
+5/8/2020
+--------
+Added rest api endpoints for admin to view completed and upcoming bookings.
+Deployed the front end code in heroku. Created docker images for backend code and deployed it in ec2 autoscaling group behind a load balancer.
 
 4/28/2020
 ---------
@@ -70,3 +74,5 @@ Communicated the tasks to be done clearly to other team members. Had productive 
 
 # XP Core Values
 Communication
+
+Made sure the communication during scrum meetings is clear and open. Facilitated an environment encouraging discussions and feedback.
