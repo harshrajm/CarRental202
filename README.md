@@ -34,5 +34,18 @@
 ![Admin 1](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/admin_1.png)
 ![Admin 2](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/UI%20screenshots/admin_2.png)
 
+## Journals
+[Journal link](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/tree/master/journals)
+
+## Sprint Task Sheet
+[Sprint task sheet link](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/burndown%20chart/CMPE%20202%20Sprint%20Task%20Sheet-FirmwareRebels.xlsx)
+
+## Project Board
+[Front End](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/projects/3)
+
+[Backend](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/projects/2)
+
+[Others](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/projects/1)
+
 ## Burndown chart
 ![Burndown chart](https://github.com/gopinathsjsu/sp20-cmpe-202-sec-03-team-project-firmware-rebels/blob/master/burndown%20chart/Screenshot%202020-05-09%20at%2011.00.57%20AM.png)
