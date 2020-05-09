@@ -11,7 +11,6 @@
 - Harshraj
 - Varun
 
-## UI Wireframes
 
 ## Use case diagram
 
